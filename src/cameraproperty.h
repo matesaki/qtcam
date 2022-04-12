@@ -52,6 +52,7 @@ public:
         USB2_0 = 1,
         USB3_0 = 2
     };
+    bool logHere = true;
 
     Cameraproperty();
     Cameraproperty(bool enableLog);
@@ -63,6 +64,7 @@ public:
     FrameRenderer frmrend;
     logger log;
     void checkforEconDevice(QStringList*);
+    void gainDeviceNodeMap(int deviceIndex, QString &deviceNode);
 
     static QStringListModel modelCam;
     static bool saveLog;

@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <iostream>
 
 #include "fscam_cu135.h"
 #include "uvccamera.h"
@@ -345,6 +346,7 @@ bool FSCAM_CU135::getiHDRMode()
 
 bool FSCAM_CU135::setStreamMode(camStreamMode streamMode)
 {
+    std::cout << "fscam_cu135.cpp | setStreamMode() streamMode:" << streamMode << std::endl << std::flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -376,6 +378,7 @@ bool FSCAM_CU135::setStreamMode(camStreamMode streamMode)
 
 bool FSCAM_CU135::getStreamMode()
 {
+    std::cout << "fscam_cu135.cpp | getStreamMode()" << std::endl << std::flush;
    uint streamMode;
 
    // hid validation
@@ -886,6 +889,8 @@ bool FSCAM_CU135::setToDefault()
 
 bool FSCAM_CU135::storePreviewFrame()
 {
+    std::cout << "fscam_cu135.cpp | storePreviewFrame()" << std::endl << std::flush;
+
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -910,6 +915,8 @@ bool FSCAM_CU135::storePreviewFrame()
 
 bool FSCAM_CU135::storeStillFrame(uint stillformatId, uint stillresolutionId)
 {
+    std::cout << "fscam_cu135.cpp | storeStillFrame() stillformatId:" << stillformatId << "  stillresolutionId:" << stillresolutionId << std::endl << std::flush;
+
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -928,6 +935,7 @@ bool FSCAM_CU135::storeStillFrame(uint stillformatId, uint stillresolutionId)
     // send request and get reply from camera
     if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
         if (g_in_packet_buf[6]== GET_SUCCESS) {
+            std::cout << "fscam_cu135.cpp | emit storeStillFrameSucceess()" << std::endl << std::flush;
             emit storeStillFrameSucceess();
             return true;
         }
@@ -937,6 +945,7 @@ bool FSCAM_CU135::storeStillFrame(uint stillformatId, uint stillresolutionId)
 
 bool FSCAM_CU135::getNumberOfFramesCanStore(uint stillformatId, uint stillresolutionId)
 {
+    std::cout << "fscam_cu135.cpp | getNumberOfFramesCanStore() stillformatId:" << stillformatId << "  stillresolutionId:" << stillresolutionId << std::endl << std::flush;
    uint numberOfFrames;
 
    if(uvccamera::hid_fd < 0)
@@ -957,6 +966,7 @@ bool FSCAM_CU135::getNumberOfFramesCanStore(uint stillformatId, uint stillresolu
    if(uvc.sendHidCmd(g_out_packet_buf, g_in_packet_buf, BUFFER_LENGTH)){
    if (g_in_packet_buf[6]== SET_SUCCESS) {
        numberOfFrames = g_in_packet_buf[4];
+       std::cout << "fscam_cu135.cpp | getNumberOfFramesCanStore() numberOfFrames:" << numberOfFrames << std::endl << std::flush;
        emit numberOfframesStoreCapacity(numberOfFrames);
            return true;
    }
@@ -967,6 +977,7 @@ bool FSCAM_CU135::getNumberOfFramesCanStore(uint stillformatId, uint stillresolu
 
 bool FSCAM_CU135::setStillResolution(uint stillformatId, uint stillresolutionId)
 {
+    std::cout << "fscam_cu135.cpp | setStillResolution() stillformatId:" << stillformatId << "  stillresolutionId:" << stillresolutionId << std::endl << std::flush;
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -993,6 +1004,7 @@ bool FSCAM_CU135::setStillResolution(uint stillformatId, uint stillresolutionId)
 }
 bool FSCAM_CU135::grabStillFrame(uint frameIndex, uint stillformatId, uint stillresolutionId)
 {
+    std::cout << "fscam_cu135.cpp | grabStillFrame() frameIndex:" << frameIndex << "  stillformatId:" << stillformatId << "  stillresolutionId:" << std::endl << std::flush;
 
     if(uvccamera::hid_fd < 0)
     {
@@ -1022,6 +1034,7 @@ bool FSCAM_CU135::grabStillFrame(uint frameIndex, uint stillformatId, uint still
 
 bool FSCAM_CU135::grabPreviewFrame()
 {
+    //std::cout << "fscam_cu135.cpp | grabPreviewFrame()" << std::endl << std::flush;
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -1063,6 +1076,7 @@ bool FSCAM_CU135::getStillResolution()
        if (g_in_packet_buf[6]== SET_SUCCESS) {
        stillformatId = g_in_packet_buf[2];
        stillResolutionId = g_in_packet_buf[3];
+       std::cout << "fscam_cu135.cpp | getStillResolution() stillformatId:" << stillformatId << "  stillResolutionId:" << stillResolutionId << std::endl << std::flush;
            emit stillsettingsReceived(stillformatId, stillResolutionId);
            return true;
            }

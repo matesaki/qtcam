@@ -26,6 +26,10 @@
 #include <string.h>
 #include <libevdev-1.0/libevdev/libevdev.h>
 #include <QCollator>
+#include <iostream>
+
+using namespace std;
+
 QStringListModel Cameraproperty::modelCam;
 bool Cameraproperty::saveLog;
 int Cameraproperty::event_fd;
@@ -83,7 +87,7 @@ void Cameraproperty::selectedDeviceEnum(CommonEnums::ECameraNames selectedCamera
  * @param Businfo - pci bus information using [querycap.bus_info] in v4l2 query capability
  */
 void Cameraproperty::openEventNode(QString businfo){ //open device event path file Ex: /dev/input/eventX/
-
+    cout << "Cameraproperty::openEventNode() | businfo: " << businfo.toStdString() << endl;
     int deviceEventCount = 0;
 
     DIR *dir;
@@ -145,6 +149,7 @@ void Cameraproperty::openEventNode(QString businfo){ //open device event path fi
 }
 
 void Cameraproperty::checkforDevice() {
+    if(logHere) cout << "Cameraproperty::checkforDevice()" << endl;
     int deviceBeginNumber,deviceEndNumber;
     cameraMap.clear();
     deviceNodeMap.clear();
@@ -225,6 +230,27 @@ void Cameraproperty::checkforDevice() {
     uvccam.findEconDevice("video4linux");
     availableCam.prepend("----Select Camera Device----");
     modelCam.setStringList(availableCam);
+
+    if(logHere) cout << "Cameraproperty::checkforDevice() | availableCam:" << endl << flush;
+    for (auto c : availableCam){
+        if(logHere) cout << "Cameraproperty::checkforDevice() | - " << c.toStdString() << endl << flush;
+    }
+
+    if(logHere) cout << "Cameraproperty::checkforDevice() | cameraMap:" << endl << flush;
+    QMapIterator<int, QString> i(cameraMap);
+    while (i.hasNext()) {
+        i.next();
+        if(logHere) cout << "Cameraproperty::checkforDevice() | - " << i.key() << ": " << i.value().toStdString() << endl;
+    }
+
+    if(logHere) cout << "Cameraproperty::checkforDevice() | deviceNodeMap:" << endl << flush;
+    QMapIterator<int, QString> ii(deviceNodeMap);
+    while (ii.hasNext()) {
+        ii.next();
+        if(logHere) cout << "Cameraproperty::checkforDevice() | - " << ii.key() << ": " << ii.value().toStdString() << endl;
+    }
+
+
     //Modified by Nithyesh
     /*
      * Removed arg availableCam from function as it was unused.
@@ -302,6 +328,7 @@ int Cameraproperty::getUsbSpeed(QString serialNumber){
 }
 
 void Cameraproperty::setCurrentDevice(QString deviceIndex,QString deviceName) {
+    if(logHere) cout << "Cameraproperty::setCurrentDevice() | deviceIndex: " << deviceIndex.toStdString() << " deviceName: " << deviceName.toStdString() << endl;
 
     if(deviceIndex.isEmpty() || deviceName.isEmpty())
     {
@@ -364,3 +391,7 @@ void Cameraproperty::notifyUser(QString title, QString text){
 }
 
 
+void Cameraproperty::gainDeviceNodeMap(int deviceIndex, QString &deviceNode) {
+
+    deviceNode = deviceNodeMap.value(deviceIndex);
+}

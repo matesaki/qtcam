@@ -21,6 +21,8 @@
 
 #include "see3cam_cu20.h"
 
+#include <iostream>
+using namespace std;
 
 /**
  * @brief See3CAM_CU20::setSensorMode - setting sensor mode
@@ -29,6 +31,7 @@
  */
 bool See3CAM_CU20::setSensorMode(sensorModes  sensorMode)
 {    
+    if(logHere) cout << "See3CAM_CU20::setSensorMode | sensorMode: " << sensorMode << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {        
@@ -62,6 +65,7 @@ bool See3CAM_CU20::setSensorMode(sensorModes  sensorMode)
  */
 bool See3CAM_CU20::getSensorMode()
 {
+    if(logHere) cout << "See3CAM_CU20::getSensorMode()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -96,6 +100,7 @@ bool See3CAM_CU20::getSensorMode()
  */
 bool See3CAM_CU20::setCameraMode(cameraModes  cameraMode)
 {
+    if(logHere) cout << "See3CAM_CU20::setCameraMode | cameraMode: " << cameraMode << endl;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {        
@@ -129,6 +134,7 @@ bool See3CAM_CU20::setCameraMode(cameraModes  cameraMode)
  */
 bool See3CAM_CU20::getCameraMode()
 {
+    if(logHere) cout << "See3CAM_CU20::getCameraMode()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -163,6 +169,7 @@ bool See3CAM_CU20::getCameraMode()
  */
 bool See3CAM_CU20::setSpecialMode(specialModes  specialMode)
 {
+    if(logHere) cout << "See3CAM_CU20::setSpecialMode() | specialMode: " << specialMode << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -196,6 +203,7 @@ bool See3CAM_CU20::setSpecialMode(specialModes  specialMode)
  */
 bool See3CAM_CU20::getSpecialMode()
 {
+    if(logHere) cout << "See3CAM_CU20::getSpecialMode()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -229,7 +237,7 @@ bool See3CAM_CU20::getSpecialMode()
  * @return true/false
  */
 bool See3CAM_CU20::setExposureCompensation(unsigned int exposureCompValue){
-
+    if(logHere) cout << "See3CAM_CU20::setExposureCompensation() | exposureCompValue: " << exposureCompValue << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -262,7 +270,7 @@ bool See3CAM_CU20::setExposureCompensation(unsigned int exposureCompValue){
  * @return true/false
  */
 bool See3CAM_CU20::getExposureCompensation(){
-
+    if(logHere) cout << "See3CAM_CU20::getExposureCompensation()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -298,6 +306,7 @@ bool See3CAM_CU20::getExposureCompensation(){
  */
 bool See3CAM_CU20::setOrientation(bool horzModeSel, bool vertiModeSel)
 {
+    if(logHere) cout << "See3CAM_CU20::setOrientation() | horzModeSel: " << horzModeSel << " vertiModeSel:" << vertiModeSel << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {        
@@ -339,6 +348,7 @@ bool See3CAM_CU20::setOrientation(bool horzModeSel, bool vertiModeSel)
  */
 bool See3CAM_CU20::getOrientation()
 {
+    if(logHere) cout << "See3CAM_CU20::getOrientation()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {        
@@ -373,6 +383,7 @@ bool See3CAM_CU20::getOrientation()
  * @return true/false
  */
 bool See3CAM_CU20::setStrobeMode(strobeValues strobeMode){
+    if(logHere) cout << "See3CAM_CU20::setStrobeMode() | strobeMode: " << strobeMode << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -405,6 +416,7 @@ bool See3CAM_CU20::setStrobeMode(strobeValues strobeMode){
  * @return true/false
  */
 bool See3CAM_CU20::getStrobeMode(){
+    if(logHere) cout << "See3CAM_CU20::getStrobeMode()"<< endl << flush;
 
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -444,7 +456,7 @@ bool See3CAM_CU20::getStrobeMode(){
  * return true - success /false - failure
  */
 bool See3CAM_CU20::setROIAutoExposure(uint see3camAeROIMode, uint vidResolnWidth, uint vidResolnHeight, uint xCord, uint yCord, QString winSize){
-
+    if(logHere) cout << "See3CAM_CU20::setROIAutoExposure() | see3camAeROIMode: " << see3camAeROIMode << endl << flush;
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -493,6 +505,8 @@ bool See3CAM_CU20::setROIAutoExposure(uint see3camAeROIMode, uint vidResolnWidth
  * @return true/false
  */
 bool See3CAM_CU20::getAutoExpROIModeAndWindowSize(){
+    if(logHere) cout << "See3CAM_CU20::getAutoExpROIModeAndWindowSize()" << endl << flush;
+
     if(uvccamera::hid_fd < 0)
     {
         return false;
@@ -527,6 +541,7 @@ bool See3CAM_CU20::getAutoExpROIModeAndWindowSize(){
  * @return true/false
  */
 bool See3CAM_CU20::setColourKill(uint colourKillValue){
+    if(logHere) cout << "See3CAM_CU20::setColourKill() | colourKillValue: " << colourKillValue << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -559,6 +574,7 @@ bool See3CAM_CU20::setColourKill(uint colourKillValue){
  * @return true/false
  */
 bool See3CAM_CU20::getColourKill(){
+    if(logHere) cout << "See3CAM_CU20::getColourKill()" << endl << flush;
 
     // hid validation
     if(uvccamera::hid_fd < 0)
@@ -593,6 +609,7 @@ bool See3CAM_CU20::getColourKill(){
  * @return true/false
  */
 bool See3CAM_CU20::setBurstLength(uint burstLength){
+    if(logHere) cout << "See3CAM_CU20::setBurstLength() | burstLength: " << burstLength << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -625,6 +642,7 @@ bool See3CAM_CU20::setBurstLength(uint burstLength){
  * @return true/false
  */
 bool See3CAM_CU20::getBurstLength(){
+    if(logHere) cout << "See3CAM_CU20::getBurstLength()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -658,6 +676,7 @@ bool See3CAM_CU20::getBurstLength(){
  * @return true/false
  */
 bool See3CAM_CU20::setAntiFlickerMode(camAntiFlickerMode antiFlickerMode){
+    if(logHere) cout << "See3CAM_CU20::setAntiFlickerMode() | antiFlickerMode: " << antiFlickerMode << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -689,6 +708,7 @@ bool See3CAM_CU20::setAntiFlickerMode(camAntiFlickerMode antiFlickerMode){
  * @return - true/false
  */
 bool See3CAM_CU20::getAntiFlickerMode(){
+    if(logHere) cout << "See3CAM_CU20::getAntiFlickerMode()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -721,6 +741,7 @@ bool See3CAM_CU20::getAntiFlickerMode(){
  * @return  true/false
  */
 bool See3CAM_CU20::setToDefaultValues(){
+    if(logHere) cout << "See3CAM_CU20::setToDefaultValues()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -755,6 +776,7 @@ bool See3CAM_CU20::setToDefaultValues(){
  */
 bool See3CAM_CU20::setDenoiseCtrlMode(denoiseModes  deNoiseMode)
 {
+    if(logHere) cout << "See3CAM_CU20::setDenoiseCtrlMode() | deNoiseMode: " << deNoiseMode << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {        
@@ -788,6 +810,7 @@ bool See3CAM_CU20::setDenoiseCtrlMode(denoiseModes  deNoiseMode)
  */
 bool See3CAM_CU20::getDenoiseCtrlMode()
 {
+    if(logHere) cout << "See3CAM_CU20::getDenoiseCtrlMode()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -821,6 +844,7 @@ bool See3CAM_CU20::getDenoiseCtrlMode()
  * @return true/false
  */
 bool See3CAM_CU20::setLSCMode(uint lscMode){
+    if(logHere) cout << "See3CAM_CU20::setLSCMode() | lscMode: " << lscMode << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -854,6 +878,7 @@ bool See3CAM_CU20::setLSCMode(uint lscMode){
  */
 bool See3CAM_CU20::getLSCMode()
 {
+    if(logHere) cout << "See3CAM_CU20::getLSCMode()" << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -885,6 +910,7 @@ bool See3CAM_CU20::getLSCMode()
  * @brief See3CAM_CU20::initializeBuffers - Initialize input and output buffers
  */
 void See3CAM_CU20::initializeBuffers(){
+    //if(logHere) cout << "See3CAM_CU20::initializeBuffers()" << endl << flush;
 
     //Initialize input and output buffers
     memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));

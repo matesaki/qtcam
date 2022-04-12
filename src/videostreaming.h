@@ -55,6 +55,7 @@ class FrameRenderer : public QObject, protected QOpenGLFunctions
 public:
     FrameRenderer();
     ~FrameRenderer();
+    bool logHere = true;
 
     int skipH264Frames;
 
@@ -187,7 +188,8 @@ public:
         size_t  length[VIDEO_MAX_PLANES];
     };
     Videostreaming();
-    ~Videostreaming();   
+    ~Videostreaming();
+    bool logHere = true;
     
     qreal t() const { return m_t; }
     void setT(qreal t);

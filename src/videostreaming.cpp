@@ -36,6 +36,7 @@
 #include <QtConcurrent>
 #include "fscam_cu135.h"
 #include "uvccamera.h"
+#include <iostream>
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 #define SEE3CAM160_MJPEG_MAXBYTESUSED       4193280
@@ -60,6 +61,8 @@
 #ifndef min
 #define min(a,b) ((a)<(b)?(a):(b))
 #endif
+
+using namespace std;
 
 int h264DecodeRet;
 QStringListModel Videostreaming::resolution;
@@ -99,6 +102,7 @@ static unsigned short mIndicesData[] = { 0, 1, 2, 0, 2, 3 };
 Videostreaming::Videostreaming() : m_t(0)
   , m_renderer(0)
 {
+    if(logHere) cout << "Videostreaming::Videostreaming()" << endl;
     openSuccess = false;
     updateOnce = true;
     m_snapShot = false;
@@ -175,6 +179,7 @@ Videostreaming::~Videostreaming()
  * @brief Videostreaming::updateBuffer - set flag to render preview or not.
  */
 void Videostreaming::updateBuffer(){
+    //if(logHere) cout << "Videostreaming::updateBuffer()" << endl << flush;
     m_renderer->updateBuffer();
 }
 
@@ -182,6 +187,7 @@ void Videostreaming::updateBuffer(){
 * updateBuffer - if frame is received, render frame otherwise stop rendering
 */
 void FrameRenderer::updateBuffer(){
+    //if(logHere) cout << "FrameRenderer::updateBuffer()" << endl << flush;
     if(renderBufferFormat == CommonEnums::BUFFER_RENDER_360P){   //Added by Navya : 16 March 2020 -- Split yuyv data only for 640x480/640x360 resolution.
         if(renderMutex.tryLock()){
             if(yuvBuffer != NULL){
@@ -220,6 +226,7 @@ void FrameRenderer::updateBuffer(){
 */
 void Videostreaming::setT(qreal t)
 {
+    //if(logHere) cout << "Videostreaming::setT()" << endl << flush;
     if (t == m_t)
         return;
     m_t = t;
@@ -235,6 +242,7 @@ void Videostreaming::setT(qreal t)
 */
 void Videostreaming::handleWindowChanged(QQuickWindow *win)
 {
+    if(logHere) cout << "Videostreaming::handleWindowChanged(QQuickWindow)" << endl << flush;
     if (win) {
         connect(win, &QQuickWindow::beforeSynchronizing, this, &Videostreaming::sync, Qt::DirectConnection);
         connect(win, &QQuickWindow::sceneGraphInvalidated, this, &Videostreaming::cleanup, Qt::DirectConnection);
@@ -256,6 +264,7 @@ void Videostreaming::handleWindowChanged(QQuickWindow *win)
 */
 void Videostreaming::cleanup()
 {
+    if(logHere) cout << "Videostreaming::cleanup()" << endl << flush;
     if (m_renderer) {
         delete m_renderer;
         m_renderer = 0;
@@ -267,6 +276,7 @@ void Videostreaming::cleanup()
 */
 void Videostreaming::sync()
 {
+    //if(logHere) cout << "Videostreaming::sync()" << endl << flush;
     if (!m_renderer) {
         m_renderer = new FrameRenderer();
         m_renderer->videoResolutionwidth = 640; // need to check this assignment is needed.
@@ -293,6 +303,7 @@ FrameRenderer::~FrameRenderer()
 }
 
 FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
+    if(logHere) cout << "FrameRenderer::FrameRenderer()" << endl;
     yBuffer = NULL;
     uBuffer = NULL;
     vBuffer = NULL;
@@ -322,6 +333,7 @@ FrameRenderer::FrameRenderer(): m_t(0),m_programYUYV(0){
  * @param *destWindowHeight - to store target window viewport height
  */
 void FrameRenderer::calculateViewport(int vidResolutionWidth, int vidResolutionHeight, int windowWidth, int windowHeight, int *x, int *y, int *destWindowWidth, int *destWindowHeight){
+    if(logHere) cout << "FrameRenderer::calculateViewport()" << endl << flush;
     int original_width = vidResolutionWidth;
     int original_height = vidResolutionHeight;
     int bound_width = windowWidth;
@@ -357,10 +369,12 @@ void FrameRenderer::calculateViewport(int vidResolutionWidth, int vidResolutionH
 
 void FrameRenderer::selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum)
 {
+    if(logHere) cout << "FrameRenderer::selectedCameraEnum()" << endl << flush;
     currentlySelectedEnumValue = selectedDeviceEnum;
 }
 
 void FrameRenderer::drawBufferForYUV420(){
+    if(logHere) cout << "FrameRenderer::drawBufferForYUV420()" << endl << flush;
     if (!m_shaderProgram) {
         initializeOpenGLFunctions();
 
@@ -499,6 +513,7 @@ skip:
  * @brief FrameRenderer::drawBufferFor360p - Rendering y,u,v textures individually since there is an aliasing effect in preview due to yuvtexture for 640x480 resolution alone.
  */
 void FrameRenderer::drawBufferFor360p(){
+    //if(logHere) cout << "FrameRenderer::drawBufferFor360p()" << endl << flush;
     if (!m_programYUYV) {
         initializeOpenGLFunctions();
         m_programYUYV = new QOpenGLShaderProgram();
@@ -647,6 +662,7 @@ skip:
  * @brief FrameRenderer::drawRGBABUffer - Shader for RGBA buffer and render
  */
 void FrameRenderer::drawRGBBUffer(){
+    if(logHere) cout << "FrameRenderer::drawRGBBUffer()" << endl << flush;
 
     m_shaderProgram->bind();
 
@@ -690,6 +706,7 @@ void FrameRenderer::drawRGBBUffer(){
  * @brief FrameRenderer::drawYUYVBUffer - Shader for YUYV buffer and render
  */
 void FrameRenderer::drawYUYVBUffer(){
+    if(logHere) cout << "FrameRenderer::drawYUYVBUffer()" << endl << flush;
     int skipFrames =4;
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -745,6 +762,7 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
+    if(logHere) cout << "FrameRenderer::drawUYVYBUffer()" << endl << flush;
 
     int skipFrames = 4;
     m_shaderProgram->bind();
@@ -795,6 +813,7 @@ void FrameRenderer::drawUYVYBUffer(){
  * @brief FrameRenderer::drawY8BUffer - Shader for Y8 buffer and render
  */
 void FrameRenderer::drawY8BUffer(){
+    if(logHere) cout << "FrameRenderer::drawY8BUffer()" << endl << flush;
 
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);
@@ -836,6 +855,7 @@ void FrameRenderer::drawY8BUffer(){
  * @brief FrameRenderer::clearShader - remove allshader
  */
 void FrameRenderer::clearShader(){
+    if(logHere) cout << "FrameRenderer::clearShader()" << endl << flush;
     if(m_shaderProgram){
         if (m_shaderProgram->isLinked()) {
             m_shaderProgram->release();
@@ -848,6 +868,7 @@ void FrameRenderer::clearShader(){
  * @brief FrameRenderer::changeShader - Change the shader program based on the format
  */
 void FrameRenderer::changeShader(){
+    if(logHere) cout << "FrameRenderer::changeShader()" << endl << flush;
     clearShader();
     if(m_shaderProgram){
         delete m_shaderProgram;
@@ -894,6 +915,7 @@ void FrameRenderer::changeShader(){
  * @brief FrameRenderer::shaderRGB - shader to draw RGB buffer
  */
 void FrameRenderer::shaderRGB(){
+    if(logHere) cout << "FrameRenderer::shaderRGB()" << endl << flush;
     if (!m_shaderProgram) {
         initializeOpenGLFunctions();
 
@@ -944,6 +966,7 @@ void FrameRenderer::shaderRGB(){
  * @brief FrameRenderer::shaderYUYV - shader to draw YUYV buffer
  */
 void FrameRenderer::shaderYUYV(){
+    if(logHere) cout << "FrameRenderer::shaderYUYV()" << endl << flush;
     if(!m_shaderProgram){
         initializeOpenGLFunctions();
         m_shaderProgram = new QOpenGLShaderProgram();
@@ -1031,6 +1054,7 @@ void FrameRenderer::shaderYUYV(){
  * @brief FrameRenderer::shaderY8 - shader to draw Y8 buffer
  */
 void FrameRenderer::shaderY8(){
+    if(logHere) cout << "FrameRenderer::shaderY8()" << endl;
     if(!m_shaderProgram){
         initializeOpenGLFunctions();
         m_shaderProgram = new QOpenGLShaderProgram();
@@ -1087,6 +1111,7 @@ void FrameRenderer::shaderY8(){
  * @brief FrameRenderer::shaderUYVY - shader to draw UYVY buffer
  */
 void FrameRenderer::shaderUYVY(){
+    if(logHere) cout << "FrameRenderer::shaderUYVY()" << endl;
     if(!m_shaderProgram){
         initializeOpenGLFunctions();
         m_shaderProgram = new QOpenGLShaderProgram();
@@ -1173,6 +1198,7 @@ void FrameRenderer::shaderUYVY(){
 */
 void FrameRenderer::paint()
 {
+    if(logHere) cout << "FrameRenderer::paint()" << endl << flush;
     if(gotFrame && !triggermodeFlag){               //Added by Nivedha : 12 Mar 2021 -- To avoid getting preview in trigger mode.
         if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
@@ -1221,6 +1247,7 @@ void FrameRenderer::paint()
  */
 void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *destWidth, int *destHeight){
 
+    if(logHere) cout << "FrameRenderer::getDisplayRenderArea() | X: " << displayX << " Y: " << displayY << endl << flush;
     int xMargin = 250; // [left margin + right margin ]
     int sidebarwidth;
 
@@ -1245,6 +1272,7 @@ void FrameRenderer::getDisplayRenderArea(int *displayX, int *displayY, int *dest
 }
 
 void Videostreaming::setDevice(QString deviceName) {
+    if(logHere) cout << "Videostreaming::setDevice() | deviceName: " << deviceName.toStdString() << endl << flush;
     close();
     deviceName.append(QString::number(deviceNumber,10));
     if(open(deviceName,false)) {
@@ -1266,16 +1294,19 @@ void Videostreaming::setDevice(QString deviceName) {
 }
 
 void Videostreaming::getFirstDevice(int deviceNode) {
+    if(logHere) cout << "Videostreaming::getFirstDevice() | deviceNode: " << deviceNode << endl << flush;
     deviceNumber = deviceNode;
 }
 
 void Videostreaming::getCameraName(QString deviceName){
+    if(logHere) cout << "Videostreaming::getCameraName() | deviceName: " << deviceName.toStdString() << endl << flush;
     camDeviceName=deviceName;
 }
 
 
 double Videostreaming::getTimeInSecs()
 {
+    if(logHere) cout << "Videostreaming::getTimeInSecs()" << endl << flush;
     struct timeval tv;
     if(gettimeofday(&tv, NULL)<0) return 0.0;
     else
@@ -1290,6 +1321,7 @@ double Videostreaming::getTimeInSecs()
 * return true/false
 */
 bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
+    if(logHere) cout << "Videostreaming::saveRawFile()" << endl << flush;
     if(inputBuffer == NULL){
         return false;
     }
@@ -1312,6 +1344,7 @@ bool Videostreaming::saveRawFile(void *inputBuffer, int buffersize){
 * return true/false
 */
 bool Videostreaming::saveIRImage(){
+    if(logHere) cout << "Videostreaming::saveIRImage()" << endl << flush;
     if(!bayerIRBuffer){
         return false;
     }
@@ -1339,6 +1372,7 @@ bool Videostreaming::saveIRImage(){
 }
 
 void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvailable){
+    if(logHere) cout << "Videostreaming::setPreviewBgrndArea(width: " << width << ", height: " << height << ")" << endl;
     if(m_renderer){
         if(windowResized){  //Update Application width and height only when window is resized.
             m_renderer->windowStatusChanged = true;
@@ -1352,11 +1386,15 @@ void Videostreaming::setPreviewBgrndArea(int width, int height, bool sidebarAvai
 }
 
 void Videostreaming::sidebarStateChanged(){
+    if(logHere) cout << "Videostreaming::sidebarStateChanged()" << endl;
     m_renderer->sidebarStateChanged = true;
 }
 
 void Videostreaming::capFrame()
 {
+    bool logThis = logHere;
+    if(logHere) cout << "Videostreaming::capFrame()" << endl << flush;
+
     unsigned char *temp_Buffer=NULL;
     __u32 buftype = m_buftype;
     v4l2_plane planes[VIDEO_MAX_PLANES];
@@ -1367,6 +1405,7 @@ void Videostreaming::capFrame()
     buf.length = VIDEO_MAX_PLANES;
     buf.m.planes = planes;
     if (!dqbuf_mmap(buf, buftype, again)) {
+        if(logThis) cout << "Videostreaming::capFrame() | AAAAA" << endl << flush;
         // stop the timer when device is unplugged
         if(!retrieveFrame)
             m_timer.stop();
@@ -1382,6 +1421,7 @@ void Videostreaming::capFrame()
                 if (-1 == munmap(m_buffers[i].start[p], m_buffers[i].length[p]))
                     perror("munmap");
 
+        if(logThis) cout << "Videostreaming::capFrame() | BBBBB" << endl << flush;
         // Free all buffers.
         reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 1);  // videobuf workaround
         reqbufs_mmap(reqbufs, V4L2_BUF_TYPE_VIDEO_CAPTURE, 0);
@@ -1396,6 +1436,7 @@ void Videostreaming::capFrame()
 
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && trigger_mode) //Added by M.VishnuMurali: For capturing trigger mode images.
     {
+        if(logThis) cout << "Videostreaming::capFrame() | CCCCCC" << endl << flush;
         m_renderer->gotFrame = false;
         m_renderer->updateStop = true;
         if(triggermode_skipframes)
@@ -1405,6 +1446,7 @@ void Videostreaming::capFrame()
     }
     else if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG && !trigger_mode)
     {
+        if(logThis) cout << "Videostreaming::capFrame() | DDDDDD" << endl << flush;
         m_renderer->gotFrame = true;
     }
     if (again) {
@@ -1412,6 +1454,7 @@ void Videostreaming::capFrame()
     }
 
     if (buf.flags & V4L2_BUF_FLAG_ERROR) {
+        if(logThis) cout << "Videostreaming::capFrame() | EEEEEEEE" << endl << flush;
         qbuf(buf);
         usleep(100000);
         emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,true);
@@ -1420,6 +1463,7 @@ void Videostreaming::capFrame()
 
     previewFrameSkipCount++;
     if(skippingPreviewFrame && previewFrameSkipCount <= previewFrameToSkip){
+        if(logThis) cout << "Videostreaming::capFrame() | FFFFFF" << endl << flush;
         qbuf(buf);
         retrieveFrame=true;
         emit signalTograbPreviewFrame(retrieveframeStoreCamInCross,true);
@@ -1429,6 +1473,7 @@ void Videostreaming::capFrame()
     if((currentlySelectedCameraEnum == CommonEnums::SEE3CAM_160) &&
             (m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG) && (buf.bytesused > SEE3CAM160_MJPEG_MAXBYTESUSED))
     {
+        if(logThis) cout << "Videostreaming::capFrame() | GGGGGGGG" << endl << flush;
         qbuf(buf);
         return;
     }
@@ -1436,6 +1481,7 @@ void Videostreaming::capFrame()
     switch(m_capSrcFormat.fmt.pix.pixelformat) {
     case V4L2_PIX_FMT_YUYV:
     case V4L2_PIX_FMT_UYVY:{
+        if(logThis) cout << "Videostreaming::capFrame() | case V4L2_PIX_FMT_UYVY" << endl << flush;
         if((width*height*2) == buf.bytesused){
             validFrame = true;
         }
@@ -1443,18 +1489,21 @@ void Videostreaming::capFrame()
         break;
         //Added by Navya - 22 July 2019 --To avoid invalidFrames for rendering in case of See3CAM_CU55_MH camera
     case V4L2_PIX_FMT_Y12:{
+        if(logThis) cout << "Videostreaming::capFrame() | case V4L2_PIX_FMT_Y12" << endl << flush;
         if((width*height*1.5) == buf.bytesused){
             validFrame =true;
         }
     }
         break;
     case V4L2_PIX_FMT_GREY:{
+        if(logThis) cout << "Videostreaming::capFrame() | case V4L2_PIX_FMT_GREY" << endl << flush;
         if((width*height*1) == buf.bytesused){
             validFrame =true;
         }
     }
         break;
     case V4L2_PIX_FMT_Y16:{
+        if(logThis) cout << "Videostreaming::capFrame() | case V4L2_PIX_FMT_Y16" << endl << flush;
         if((width*height*2) == buf.bytesused){
             validFrame =true;
         }
@@ -1462,6 +1511,7 @@ void Videostreaming::capFrame()
         break;
     case V4L2_PIX_FMT_MJPEG:
     {
+        if(logThis) cout << "Videostreaming::capFrame() | case V4L2_PIX_FMT_MJPEG" << endl << flush;
         validFrame = true;
         _bytesUsed = buf.bytesused;
         if(startFrame)
@@ -1471,6 +1521,7 @@ void Videostreaming::capFrame()
         }
     }break;
     default:
+        if(logThis) cout << "Videostreaming::capFrame() | case default" << endl << flush;
         validFrame = true;
         // To do: for other color spaces
         break;
@@ -1478,15 +1529,20 @@ void Videostreaming::capFrame()
     }
 
     if (validFrame != true){
+        if(logThis) cout << "Videostreaming::capFrame() | HHHHHHH" << endl << flush;
         qbuf(buf);
         emit signalTograbPreviewFrame(retrieveframeStoreCam,true); //Added by Navya ---  Inorder to get the preview
         return;
     }
 
+    if(logThis) cout << "Videostreaming::capFrame() | makeSnapShot = " << makeSnapShot << endl;
+    if(logThis) cout << "Videostreaming::capFrame() | m_burstShot = " << m_burstShot << endl;
     if(makeSnapShot || m_burstShot)
     {
+        if(logThis) cout << "Videostreaming::capFrame() | IIIIIII" << endl << flush;
         if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_MJPEG){
+                if(logThis) cout << "Videostreaming::capFrame() | IIIIIII 22222" << endl << flush;
                 if(!check_jpeg_header(m_buffers[buf.index].start[0],buf.bytesused))
                 {
                     skipImageCapture++;
@@ -1513,21 +1569,25 @@ void Videostreaming::capFrame()
 
     // prepare yuyv/rgba buffer and give to shader.
     if(!prepareBuffer(m_capSrcFormat.fmt.pix.pixelformat, m_buffers[buf.index].start[0], buf.bytesused)){
+        if(logThis) cout << "Videostreaming::capFrame() | JJJJJJJ" << endl << flush;
         qbuf(buf);
         emit signalTograbPreviewFrame(retrieveframeStoreCam,true);  //Added by Navya  ---Querying the buffer again
         return;
     }
 
     if(!m_snapShot && !retrieveShot && !frameMjpeg){  // Checking for retrieveshot flag inorder to avoid, updating still frame to UI
+        //if(logThis) cout << "Videostreaming::capFrame() | KKKKKK" << endl << flush;
         m_renderer->gotFrame = true;
     }
 
 
     if(m_snapShot || m_burstShot){
+        if(logThis) cout << "Videostreaming::capFrame() | LLLLLLL" << endl << flush;
         int err = -1;
         if(!m_renderer->y16BayerFormat){ //  y16 bayer format means these conversions are not needed. Calculations are done in "prepareBuffer" function itself.
             // Ex: cu40 camera
             if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y16){ // y16
+                if(logThis) cout << "Videostreaming::capFrame() | MMMMMMM" << endl << flush;
                 copy = m_capSrcFormat;
                 copy.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
                 err = v4lconvert_convert(m_convertData, &copy, &m_capDestFormat,
@@ -1536,6 +1596,7 @@ void Videostreaming::capFrame()
 
                 //Added by Navya :09 July 2019 --allowing still capture for Y12 format in See3CAM_CU55_MH
             }else if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_Y12){
+                if(logThis) cout << "Videostreaming::capFrame() | NNNNNNNNN" << endl << flush;
                 err = 0;
                 if(formatType == "raw"){
                     void *inputBuffer = m_buffers[buf.index].start[0] ;
@@ -1551,6 +1612,7 @@ void Videostreaming::capFrame()
                     memcpy(m_renderer->yuvBuffer,yuyvBuffer_Y12,width*height*2);
                 }
                 else{   // still capture for jpg/bmp/png files
+                    if(logThis) cout << "Videostreaming::capFrame() | OOOOOOO" << endl << flush;
                     onY12Format = false;
 
                     // Added by Navya: 12 Aug 2019 -- Fixed sizeimage and bytesperline values for incoming Src Buffer as they are updated with improper values.
@@ -1565,6 +1627,7 @@ void Videostreaming::capFrame()
                 }
             }
             else if(m_capSrcFormat.fmt.pix.pixelformat == V4L2_PIX_FMT_H264 && !m_VideoRecord){ // capture and save image in h264 format[not for video recording]
+                if(logThis) cout << "Videostreaming::capFrame() | PPPPPPP" << endl << flush;
                 v4l2_format tmpSrcFormat = m_capSrcFormat;
                 tmpSrcFormat.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
                 if(h264DecodeRet>=0 && m_renderer->skipH264Frames<0)
@@ -1576,11 +1639,13 @@ void Videostreaming::capFrame()
                 else
                     err=-1;
             }else{
+                if(logThis) cout << "Videostreaming::capFrame() | QQQQQQQQ" << endl << flush;
                 err = v4lconvert_convert(m_convertData, &m_capSrcFormat, &m_capDestFormat,
                                          (unsigned char *)m_buffers[buf.index].start[0], buf.bytesused,
                         m_capImage->bits(), m_capDestFormat.fmt.pix.sizeimage); // src format to rgb conversion
             }
             if(err == -1){
+                if(logThis) cout << "Videostreaming::capFrame() | RRRRRR" << endl << flush;
                 logCriticalHandle(v4lconvert_get_error_message(m_convertData));
                 if(retrieveframeStoreCam){
                     for(int i=0; i<m_bufReqCount; i++){
@@ -1597,17 +1662,20 @@ void Videostreaming::capFrame()
     // Taking single shot or burst shot - Skip frames if needed
 
     if(((m_frame > frameToSkip) && m_snapShot) || ((m_frame > frameToSkip) && m_burstShot)){
+        if(logThis) cout << "Videostreaming::capFrame() | SSSSSS" << endl << flush;
         getFileName(getFilePath(),getImageFormatType());
 
         /*Added by Navya: 27 Mar 2019
            Checking whether the frame is still/preview. */
-	if(width * height * 2<buf.bytesused)
-        	temp_Buffer = (unsigned char *)malloc(buf.bytesused);//width * height * 2);
-	else
-		temp_Buffer = (unsigned char *)malloc(width * height * 2);
+        if(width * height * 2<buf.bytesused)
+            temp_Buffer = (unsigned char *)malloc(buf.bytesused);//width * height * 2);
+        else
+            temp_Buffer = (unsigned char *)malloc(width * height * 2);
+
         memcpy(temp_Buffer,(unsigned char *)m_buffers[buf.index].start[0],buf.bytesused);
 
         if(buf.bytesused>0){
+            if(logThis) cout << "Videostreaming::capFrame() | TTTTTT" << endl << flush;
             if(((uint8_t *)temp_Buffer)[(buf.bytesused)-3] == 0xDC)
             {
                 if(retrieveframeStoreCam || retrieveframeStoreCamInCross)
@@ -1625,6 +1693,7 @@ void Videostreaming::capFrame()
             }
         }
         if(formatType == "raw"){// save incoming buffer directly
+            if(logThis) cout << "Videostreaming::capFrame() | UUUUUU" << endl << flush;
             if(onY12Format){  // To save Y12 image in See3CAM_CU55_MHL
                 if(saveRawFile(m_renderer->yuvBuffer,width*height*2))
                 {
@@ -1637,9 +1706,11 @@ void Videostreaming::capFrame()
                 imgSaveSuccessCount++;
             }
         }else if(formatType == "IR data(8bit BMP)"){ // save IR data
+            if(logThis) cout << "Videostreaming::capFrame() | VVVVVVVV" << endl << flush;
             if(saveIRImage()) {imgSaveSuccessCount++;}
         }
         else{ // save png, jpg, bmp files
+            if(logThis) cout << "Videostreaming::capFrame() | WWWWWWW" << endl << flush;
             unsigned char *bufferToSave = NULL;
             if(m_renderer->y16BayerFormat){ // y16 format - ex: cu40 camera
                 bufferToSave = y16BayerDestBuffer;
@@ -1685,6 +1756,7 @@ void Videostreaming::capFrame()
                 if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
                 {
                     if(m_displayCaptureDialog){
+                        if(logThis) cout << "Videostreaming::capFrame() | AAAAA" << endl << flush;
                         formatSaveSuccess(m_burstShot);
                     }
                     m_burstShot = false;
@@ -1701,6 +1773,7 @@ void Videostreaming::capFrame()
                     emit logDebugHandle("still and preview resolution and format are same");
                 }
                 if(m_displayCaptureDialog){
+                    if(logThis) cout << "Videostreaming::capFrame() | BBBBB" << endl << flush;
                     formatSaveSuccess(m_burstShot);
                 }
                 m_burstShot = false;
@@ -1757,7 +1830,7 @@ void Videostreaming::capFrame()
 */
 int Videostreaming::jpegDecode(Videostreaming *obj, unsigned char **pic, unsigned char *buf, unsigned long bytesUsed)
 {
-
+    cout << "Videostreaming::jpegDecode()" << endl;
     int retval = 0;
     obj->m_renderer->renderyuyvMutex.lock();
     tjhandle handle = NULL;
@@ -1935,6 +2008,7 @@ int Videostreaming::decomp(Videostreaming *obj,unsigned char **jpegbuf,
                            unsigned long *jpegsize, unsigned char *dstbuf, int w, int h,
                            int jpegqual, int tilew, int tileh,unsigned char **pic)
 {
+    cout << "Videostreaming::decomp()" << endl;
     tjhandle handle = NULL;
     char  qualstr[6] = "\0";
     double elapsed, elapsedDecode;
@@ -2364,6 +2438,7 @@ void rgb2yuyv(uint8_t *prgb, uint8_t *pyuv, int width, int height)
 
 // Added by Sankari: Nov 8 2017 . prepare yuv buffer and give to shader.
 bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed){
+    cout << "Videostreaming::prepareBuffer()" << endl;
     if(pixformat == V4L2_PIX_FMT_MJPEG){
         frameMjpeg = true;
         m_renderer->renderBufferFormat = CommonEnums::RGB_BUFFER_RENDER;
@@ -2563,6 +2638,7 @@ bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 byt
  * @param obj - passing Videostreaming class object
  */
 void Videostreaming::captureVideoInThread(Videostreaming *obj){
+    cout << "Videostreaming::captureVideoInThread()" << endl << flush;
     emit obj->captureVideo();
 }
 
@@ -2571,6 +2647,7 @@ void Videostreaming::captureVideoInThread(Videostreaming *obj){
  * @brief Videostreaming::doAfterChangeFPSAndShot
  */
 void Videostreaming::doAfterChangeFPSAndShot(){
+    cout << "Videostreaming::doAfterChangeFPSAndShot()" << endl;
     makeSnapShot = false;
     m_snapShot = false;
     retrieveShot = false;
@@ -2587,6 +2664,7 @@ void Videostreaming::doAfterChangeFPSAndShot(){
 
 void Videostreaming::freeBuffer(unsigned char *ptr)
 {
+    cout << "Videostreaming::freeBuffer()" << endl;
     if(ptr) {
         free(ptr); ptr = NULL;
     }
@@ -2596,6 +2674,7 @@ void Videostreaming::freeBuffer(unsigned char *ptr)
 //Changed type of imgHeight and imgWidth from int to __u32
 bool Videostreaming::extractIRImage(unsigned short int *srcBuffer, unsigned char *irBuffer)
 {
+    cout << "Videostreaming::extractIRImage()" << endl;
     bool ret = 1;
     unsigned int irBufferLocation = 0;
 
@@ -2618,6 +2697,7 @@ bool Videostreaming::extractIRImage(unsigned short int *srcBuffer, unsigned char
 
 void Videostreaming::freeBuffers(unsigned char *destBuffer, unsigned char *copyBuffer)
 {
+    cout << "Videostreaming::freeBuffers()" << endl;
     if(copyBuffer || destBuffer)
     {
         free(copyBuffer);
@@ -2628,6 +2708,7 @@ void Videostreaming::freeBuffers(unsigned char *destBuffer, unsigned char *copyB
 
 void Videostreaming::allocBuffers()
 {
+    cout << "Videostreaming::allocBuffers()" << endl << flush;
     m_renderer->videoResolutionwidth = m_width;
     m_renderer->videoResolutionHeight = m_height;
 
@@ -2655,6 +2736,7 @@ void Videostreaming::allocBuffers()
 }
 
 void Videostreaming::getFrameRates() {
+    cout << "Videostreaming::getFrameRates()" << endl;
     struct timeval tv, res;
     if (m_frame == 0)
         gettimeofday(&m_tv, NULL);
@@ -2673,6 +2755,7 @@ void Videostreaming::getFrameRates() {
 
 bool Videostreaming::startCapture()
 {
+    cout << "Videostreaming::startCapture()" << endl;
     __u32 buftype = m_buftype;
     v4l2_requestbuffers req;
     unsigned int i;
@@ -2751,6 +2834,7 @@ bool Videostreaming::startCapture()
 
 int Videostreaming::findMax(QList<int> *list) {
 
+    cout << "Videostreaming::findMax()" << endl;
     int array[list->count()];
     for(int j=0;j<list->count();j++)
         array[j] = list->at(j);
@@ -2777,6 +2861,7 @@ int Videostreaming::findMax(QList<int> *list) {
  * @param stillSkip
  */
 void Videostreaming::updateFrameToSkip(uint stillSkip){
+    cout << "Videostreaming::updateFrameToSkip(stillSkip: " << stillSkip << ")" << endl;
     frameToSkip = stillSkip;
 }
 
@@ -2785,12 +2870,14 @@ void Videostreaming::updateFrameToSkip(uint stillSkip){
  * @param previewSkip
  */
 void Videostreaming::updatePreviewFrameSkip(uint previewSkip){
+    cout << "Videostreaming::updatePreviewFrameSkip(previewSkip: " << previewSkip << ")" << endl;
     skippingPreviewFrame = true;
     previewFrameToSkip = previewSkip;
 }
 
 
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
+    cout << "Videostreaming::makeShot() | filePath: " << filePath.toStdString() << "  imgFormatType: " << imgFormatType.toStdString() << endl << flush;
     captureTime.start();
     // Added by Sankari : to set still skip
     emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
@@ -2840,6 +2927,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
  * @param fpsIndex - fps list index value need to set
  */
 void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatType, uint fpsIndex){
+    cout << "Videostreaming::changeFPSandTakeShot() | filePath: " << filePath.toStdString() << endl << flush;
     captureTime.start();
     m_snapShot = true;
     retrieveShot = true;
@@ -2873,6 +2961,7 @@ void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatTyp
 }
 
 void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
+    cout << "Videostreaming::triggerModeShot() | filePath: " << filePath.toStdString() << endl << flush;
 
     captureTime.restart();
     m_snapShot = true;
@@ -2904,6 +2993,7 @@ void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
 }
 
 void Videostreaming::getFileName(QString filePath,QString imgFormatType){
+    if(logHere) cout << "Videostreaming::getFileName() | filePath: " << filePath.toStdString() << endl << flush;
     QDateTime dateTime = QDateTime::currentDateTime();
     QDir tmpDir;
     if(tmpDir.cd(filePath)) {
@@ -2955,15 +3045,18 @@ QString Videostreaming::getFilePath(){
 }
 
 void Videostreaming::setImageFormatType(QString imgFormatType){
+    if(logHere) cout << "Videostreaming::setImageFormatType(imgFormatType: " << imgFormatType.toStdString() << ")" << endl;
     m_imgFormatType = imgFormatType;
 }
 
 QString Videostreaming::getImageFormatType(){
+    if(logHere) cout << "Videostreaming::getImageFormatType()" << endl;
     return m_imgFormatType;
 }
 //Added by M.VishnuMurali:moved jpeg header checking to seperate function
 bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
 {
+    if(logHere) cout << "Videostreaming::check_jpeg_header()" << endl;
     if(bytesUsed <= HEADERFRAME1)
     {
         emit logCriticalHandle("Ignoring empty buffer");
@@ -2979,6 +3072,7 @@ bool Videostreaming::check_jpeg_header(void *inputbuffer, __u32 bytesUsed)
 }
 
 void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint burstLength){
+    if(logHere) cout << "Videostreaming::makeBurstShot() | filePath: " << filePath.toStdString() << endl << flush;
 
     captureTime.start();
     m_burstShot = true;
@@ -3011,6 +3105,7 @@ void Videostreaming::makeBurstShot(QString filePath,QString imgFormatType, uint 
 }
 
 void Videostreaming::formatSaveSuccess(bool burstFlag) {
+    if(logHere) cout << "Videostreaming::formatSaveSuccess(" << burstFlag << ")" << endl << flush;
     QString imgSaveSuccessCntStr = QString::number(imgSaveSuccessCount);
     if(imgSaveSuccessCount) {
         if(burstFlag){
@@ -3038,12 +3133,14 @@ void Videostreaming::formatSaveSuccess(bool burstFlag) {
 
 bool Videostreaming::getInterval(struct v4l2_fract &interval)
 {
+    if(logHere) cout << "Videostreaming::getInterval()" << endl;
     if (m_has_interval)
         interval = m_interval;
     return m_has_interval;
 }
 
 void Videostreaming::displayFrame() {
+    if(logHere) cout << "Videostreaming::displayFrame()" << endl;
 
     emit logDebugHandle("Start Previewing");
     m_renderer->frame = m_frame = m_lastFrame = m_fps = 0;
@@ -3147,6 +3244,7 @@ void Videostreaming::openMessageDialogBox()
 }
 
 void Videostreaming::stopCapture() {
+    if(logHere) cout << "Videostreaming::stopCapture()" << endl;
     threadMonitor.waitForFinished();   //Added by M.Vishnu Murali:Inorder to finish jpegDecoding then stop else preview corruption will occur
 
     if(h264Decode!=NULL){
@@ -3250,6 +3348,7 @@ void Videostreaming::stopCapture() {
 }
 
 void Videostreaming::closeDevice() {
+    if(logHere) cout << "Videostreaming::closeDevice()" << endl;
     emit logDebugHandle("Closing the current camera device");
     if (fd() >= 0) {
         if (m_capNotifier) {
@@ -3268,6 +3367,7 @@ void Videostreaming::closeDevice() {
 }
 
 void Videostreaming::startAgain() {
+    if(logHere) cout << "Videostreaming::startAgain()" << endl;
 
     m_renderer->renderyuyvMutex.lock();
     m_renderer->gotFrame = false;
@@ -3284,6 +3384,7 @@ void Videostreaming::startAgain() {
 }
 
 void Videostreaming::lastPreviewResolution(QString resolution,QString format) {
+    if(logHere) cout << "Videostreaming::lastPreviewResolution()" << endl;
     lastPreviewSize = resolution;
     lastFormat = format;
     emit logDebugHandle("Last Resolution displayed at::"+resolution);
@@ -3294,12 +3395,13 @@ void Videostreaming::lastPreviewResolution(QString resolution,QString format) {
  * @param fps
  */
 void Videostreaming::lastFPS(QString fps) {
+    if(logHere) cout << "Videostreaming::lastFPS()" << endl;
     lastFPSValue = fps;
 }
 
 void Videostreaming::setResoultion(QString resolution)
 {
-
+    if(logHere) cout << "Videostreaming::setResoultion | resolution: " << resolution.toStdString() << endl << flush;
     emit logDebugHandle("Resolution set at::"+resolution);
     v4l2_format fmt;
     unsigned int width, height;
@@ -3324,6 +3426,7 @@ void Videostreaming::setResoultion(QString resolution)
  */
 QString Videostreaming::getResoultion()
 {
+    if(logHere) cout << "Videostreaming::getResoultion()" << endl;
     v4l2_format fmt;
     unsigned int width, height;
     QString resolutionStr;
@@ -3339,6 +3442,7 @@ QString Videostreaming::getResoultion()
 }
 
 void Videostreaming::displayStillResolution() {
+    if(logHere) cout << "Videostreaming::displayStillResolution()" << endl;
     g_fmt_cap(V4L2_BUF_TYPE_VIDEO_CAPTURE, fmt);
 
     QStringList dispStillRes;
@@ -3365,6 +3469,7 @@ void Videostreaming::displayStillResolution() {
 }
 
 void Videostreaming::displayEncoderList(){
+    if(logHere) cout << "Videostreaming::displayEncoderList()" << endl;
     QStringList encoders;
     encoders.clear();
     if(m_pixelformat == V4L2_PIX_FMT_H264)
@@ -3375,6 +3480,7 @@ void Videostreaming::displayEncoderList(){
 }
 
 void Videostreaming::displayVideoResolution() {
+    if(logHere) cout << "Videostreaming::displayVideoResolution()" << endl;
 
     g_fmt_cap(V4L2_BUF_TYPE_VIDEO_CAPTURE, fmt);
 
@@ -3409,6 +3515,7 @@ void Videostreaming::displayVideoResolution() {
 
 void Videostreaming::vidCapFormatChanged(QString idx)
 {
+    if(logHere) cout << "Videostreaming::vidCapFormatChanged() | idx: " << idx.toStdString() << endl << flush;
     v4l2_fmtdesc desc;
     enum_fmt_cap(desc, m_buftype, true, idx.toInt());
     v4l2_format fmt;
@@ -3425,6 +3532,7 @@ void Videostreaming::vidCapFormatChanged(QString idx)
 
 void Videostreaming::updateVidOutFormat()
 {
+    if(logHere) cout << "Videostreaming::updateVidOutFormat()" << endl;
     v4l2_fmtdesc desc;
     v4l2_format fmt;
     g_fmt_cap(m_buftype, fmt);
@@ -3446,6 +3554,7 @@ void Videostreaming::updateVidOutFormat()
 }
 
 void Videostreaming::displayOutputFormat() {
+    if(logHere) cout << "Videostreaming::displayOutputFormat()" << endl;
     QStringList dispOutFormat;
     v4l2_fmtdesc fmt;
     pixFormat.clear();
@@ -3467,6 +3576,7 @@ void Videostreaming::displayOutputFormat() {
 
 void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
 {
+    if(logHere) cout << "Videostreaming::updateFrameInterval()" << endl;
     v4l2_frmivalenum frmival;
     bool ok;
     QStringList tempResList = frameSize.split('x');
@@ -3500,11 +3610,13 @@ void Videostreaming::updateFrameInterval(QString pixelFormat, QString frameSize)
 
 // Added by Sankari: setting stringlist model is moved from updateFrameInterval() as a separate function
 void Videostreaming::enumerateFPSList(){
+    if(logHere) cout << "Videostreaming::enumerateFPSList()" << endl;
     fpsList.setStringList(availableFPS);
 }
 
 void Videostreaming::frameIntervalChanged(int idx ,uint setFps)
 {
+    if(logHere) cout << "Videostreaming::frameIntervalChanged(idx: " << idx << ", setFps: " << setFps << ")" << endl;
     v4l2_frmivalenum frmival;
     __u32 pixFmt = m_pixelformat;
         emit logDebugHandle("Pixel Format:"+ QString::number(m_pixelformat));
@@ -3537,6 +3649,7 @@ void Videostreaming::frameIntervalChanged(int idx ,uint setFps)
 }
 
 void Videostreaming::cameraFilterControls(bool actualValue) {
+    if(logHere) cout << "Videostreaming::cameraFilterControls(actualValue: " << actualValue << ")" << endl;
     v4l2_queryctrl qctrl;
     v4l2_querymenu qmenu;
     int indexValue;
@@ -3611,6 +3724,7 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
 }
 
 QString Videostreaming::getSettings(unsigned int id) {
+    if(logHere) cout << "Videostreaming::getSettings()" << endl;
     int tries = IOCTL_RETRY;
     struct v4l2_control c;
     c.id = id;
@@ -3622,6 +3736,7 @@ QString Videostreaming::getSettings(unsigned int id) {
 }
 
 void Videostreaming::changeSettings(unsigned int id, QString value) {
+    if(logHere) cout << "Videostreaming::changeSettings()" << endl;
     struct v4l2_control c;
     c.id = id;
     c.value = value.toInt();
@@ -3631,6 +3746,7 @@ void Videostreaming::changeSettings(unsigned int id, QString value) {
 }
 
 void Videostreaming::selectMenuIndex(unsigned int id, int value) {
+    if(logHere) cout << "Videostreaming::selectMenuIndex()" << endl;
     v4l2_queryctrl qctrl;
     v4l2_querymenu qmenu;
     qctrl.id = id;
@@ -3648,6 +3764,7 @@ void Videostreaming::selectMenuIndex(unsigned int id, int value) {
 }
 
 int Videostreaming::getMenuIndex(unsigned int id,int value) {
+    if(logHere) cout << "Videostreaming::getMenuIndex()" << endl;
     v4l2_queryctrl qctrl;
     v4l2_querymenu qmenu;
     qctrl.id = id;
@@ -3668,6 +3785,7 @@ int Videostreaming::getMenuIndex(unsigned int id,int value) {
 }
 
 void Videostreaming::setStillVideoSize(QString stillValue, QString stillFormat) {
+    if(logHere) cout << "Videostreaming::setStillVideoSize()" << endl;
     stillSize = stillValue;
     stillOutFormat = stillFormat;
     if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_H264)
@@ -3824,6 +3942,7 @@ void Videostreaming::updatepreview() {
 }
 
 void Videostreaming::triggerModeEnabled() {
+    if(logHere) cout << "Videostreaming::triggerModeEnabled()" << endl;
     if(currentlySelectedCameraEnum == CommonEnums::SEE3CAM_24CUG)
     {
         triggerModeSkipframes();                //Added by Nivedha : 12 Mar 2021 -- To skip 3frames initially when trigger mode is enabled.
@@ -3834,6 +3953,7 @@ void Videostreaming::triggerModeEnabled() {
 }
 
 void Videostreaming::masterModeEnabled() {
+    if(logHere) cout << "Videostreaming::masterModeEnabled()" << endl;
     trigger_mode = false;
     m_renderer->triggermodeFlag = false;
      m_snapShot = false;
@@ -3846,6 +3966,7 @@ void Videostreaming::masterModeEnabled() {
  */
 void Videostreaming::selectedCameraEnum(CommonEnums::ECameraNames selectedDeviceEnum)
 {
+    if(logHere) cout << "Videostreaming::selectedCameraEnum()" << endl;
     currentlySelectedCameraEnum = selectedDeviceEnum;
 }
 
@@ -3891,7 +4012,7 @@ void Videostreaming::retrieveFrameFromStoreCam() {
  */
 void Videostreaming::switchToStillPreviewSettings(bool stillSettings){
 
-
+    if(logHere) cout << "Videostreaming::switchToStillPreviewSettings(stillSettings: " << stillSettings << ")" << endl;
     if (!((stillSize == lastPreviewSize) && (stillOutFormat == lastFormat)))
     {
         resolnSwitch();   //Replaced stopCapture() with resolnSwitch() inorder to get preview in higher resolns while using Retrieve button.
@@ -3928,6 +4049,7 @@ void Videostreaming::doCaptureFrameTimeout()
  * @param imgFormatType - image format type like jpg,png,raw,bmp
  */
 void Videostreaming::retrieveShotFromStoreCam(QString filePath,QString imgFormatType) {
+    if(logHere) cout << "Videostreaming::retrieveShotFromStoreCam()" << endl;
     m_snapShot = true;
     retrieveShot = true;
     m_burstShot = false;

@@ -1,0 +1,13 @@
+*.o
+src/moc_*.cpp
+src/moc_*.h
+src/Qtcam
+src/Makefile
+src/.qmake.stash
+src/logfile/
+src/qtcam
+src/qtcam.pro.user
+
+OUTPUTS.txt
+out.txt
+out.x

@@ -17,9 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <iostream>
 
 #include "uvccamera.h"
 #include "QStringList"
+
+using namespace std;
 
 QMap<QString, QString> uvccamera::cameraMap;
 QMap<QString, QString> uvccamera::serialNumberMap;
@@ -122,6 +125,7 @@ unsigned int uvccamera::getTickCount()
 
 int uvccamera::enumerateDevices(QStringList* deviceNames,QStringList* devicePaths)
 {
+    cout << "uvccamera::enumerateDevices()" << endl << flush;
     struct udev *udev;
     struct udev_enumerate *enumerate;
     struct udev_list_entry *devices, *dev_list_entry;
@@ -209,6 +213,7 @@ int uvccamera::enumerateDevices(QStringList* deviceNames,QStringList* devicePath
 
 int uvccamera::findEconDevice(QString parameter)
 {
+    std::cout << "uvccamera::findEconDevice() parameter: " << parameter.toStdString() << std::endl << std::flush;
     emit logHandle(QtDebugMsg,"Check Devices of"+ parameter);
     cameraMap.clear();
     struct udev *udev;
@@ -315,6 +320,7 @@ int uvccamera::findEconDevice(QString parameter)
  */
 void uvccamera::currentlySelectedDevice(QString deviceName)
 {
+    cout << "uvccamera::currentlySelectedDevice() | deviceName: " << deviceName.toStdString() << endl << flush;
     deviceName.remove(QRegExp("[\n\t\r]"));
 
     bool deviceFound = false;
@@ -354,6 +360,7 @@ void uvccamera::currentlySelectedDevice(QString deviceName)
 }
 
 int uvccamera::initExtensionUnitAscella(){
+    cout << "uvccamera::initExtensionUnitAscella()" << endl << flush;
     int ret;
 
     exitExtensionUnitAscella();
@@ -396,6 +403,7 @@ int uvccamera::initExtensionUnitAscella(){
 }
 
 bool uvccamera::closeAscellaDevice(){
+    cout << "uvccamera::closeAscellaDevice()" << endl << flush;
     int res;
 
     if(handle == NULL){
@@ -626,6 +634,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     }
 
 void uvccamera::getDeviceNodeName(QString hidDeviceNode) {
+    cout << "uvccamera::closeAscellaDevice() | hidDeviceNode: " << hidDeviceNode.toStdString() << endl << flush;
     if(hidDeviceNode.isEmpty())
     {
         emit logHandle(QtCriticalMsg,"hid Device usbAddress Not found as parameter\n");
@@ -1186,6 +1195,7 @@ bool See3CAM_GPIOControl::setGpioLevel(camGpioPin gpioPin,camGpioValue gpioValue
 //Modified by Dhurka - Braces alignment - 14th Oct 2016
 bool See3CAM_ModeControls::enableMasterMode()
 {
+    cout << "See3CAM_ModeControls::enableMasterMode()" << endl << flush;
     int ret =0;
 
     if(uvccamera::hid_fd < 0)
@@ -1207,6 +1217,7 @@ bool See3CAM_ModeControls::enableMasterMode()
 //Modified by Dhurka - Braces alignment - 14th Oct 2016
 bool See3CAM_ModeControls::enableTriggerMode()
 {
+    cout << "See3CAM_ModeControls::enableTriggerMode()" << endl << flush;
     int ret =0;
 
     if(uvccamera::hid_fd < 0)
@@ -1236,6 +1247,7 @@ bool See3CAM_ModeControls::enableTriggerMode()
  * */
 bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
 {
+    //cout << "uvccamera::sendHidCmd()" << endl << flush;
     // Write data into camera
     int ret = write(hid_fd, outBuf, len);
     if (ret < 0) {
@@ -1253,12 +1265,14 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
 
     // Monitor read file descriptor for 5 secs
 
+    //cout << "uvccamera::sendHidCmd() select()" << endl << flush;
     if(0 > select(1, &rfds, NULL, NULL, &tv)){
 
       perror("select");
         return false;
     }
 
+    //cout << "uvccamera::sendHidCmd() read()" << endl << flush;
     // Read data from camera
     int retval = read(hid_fd, inBuf, len);
     if (retval < 0) {

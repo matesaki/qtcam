@@ -24,6 +24,7 @@
 #include <QIcon>
 #include <QStandardPaths>
 #include<QProcess>
+#include <iostream>
 #include "qtquick2applicationviewer.h"
 #include "cameraproperty.h"
 #include "videostreaming.h"
@@ -78,6 +79,8 @@
 // * \ref See3CAM_10CUG
 // * \section See3CAM_10CUG
 // * Bayer Camera
+
+using namespace std;
 
 int main(int argc, char *argv[])
 {
@@ -181,7 +184,36 @@ int main(int argc, char *argv[])
 
     Videostreaming vs;   
     AudioInput audio;
+
+
+    ///////////////////// MARTY /////////////////////
+
+    int deviceIndex = 42;
+    camProperty.checkforDevice();
+    camProperty.checkforDevice();
+    QStringList availableCam = camProperty.modelCam.stringList();
+    for (int i = 0; i < availableCam.size(); ++i) {
+        if (availableCam.at(i).toStdString() == "See3CAM_CU20") {
+            deviceIndex = i;
+            break;
+        }
+    }
+    cout << "|| deviceIndex: " << deviceIndex << endl;
+    camProperty.setCurrentDevice(QString::number(deviceIndex), "See3CAM_CU20");
+
+    QString deviceNode = "";
+    camProperty.gainDeviceNodeMap(deviceIndex, deviceNode);
+    cout << "|| deviceNode: " << deviceNode.toStdString() << endl;
+    camProperty.openEventNode(deviceNode);
+
+    See3CAM_CU20 cu20;
+    bool res = cu20.getCameraMode();
+    cout << "|| res: " << res << endl;
+
     
+    /////////////////////////////////////////////////
+
+
     if(is20_04detected)
         viewer.rootContext()->setContextProperty("is20_04detcted", QVariant(true));
     else {

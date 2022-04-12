@@ -4,7 +4,7 @@ folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
 QT += widgets concurrent multimedia
-TARGET = Qtcam
+TARGET = qtcam
 
 CONFIG += release
 
@@ -135,6 +135,12 @@ BOARD_ARM64 = $$system(dpkg --print-architecture | grep -o "arm64")
 DISTRIBUTION_NAME = $$system(lsb_release -a | grep -o "bionic")
 contains(DISTRIBUTION_NAME,bionic):{
 QMAKE_CXX = "g++-5"
+QMAKE_CXXFLAGS += -std=c++11
+}
+
+DISTRIBUTION_NAME = $$system(lsb_release -a | grep -o "focal")
+contains(DISTRIBUTION_NAME,focal):{
+QMAKE_CXX = "g++-9"
 QMAKE_CXXFLAGS += -std=c++11
 }
 
