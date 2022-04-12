@@ -1198,7 +1198,7 @@ void FrameRenderer::shaderUYVY(){
 */
 void FrameRenderer::paint()
 {
-    if(logHere) cout << "FrameRenderer::paint()" << endl << flush;
+    //if(logHere) cout << "FrameRenderer::paint()" << endl << flush; // prints every frame
     if(gotFrame && !triggermodeFlag){               //Added by Nivedha : 12 Mar 2021 -- To avoid getting preview in trigger mode.
         if(m_formatChange | m_videoResolnChange){  // Call to change Shader on format and Resolution change
             m_formatChange = false;
@@ -1392,8 +1392,9 @@ void Videostreaming::sidebarStateChanged(){
 
 void Videostreaming::capFrame()
 {
-    bool logThis = logHere;
-    if(logHere) cout << "Videostreaming::capFrame()" << endl << flush;
+    //bool logThis = logHere;
+    bool logThis = false;
+    // if(logHere) cout << "Videostreaming::capFrame()" << endl << flush; // every frame
 
     unsigned char *temp_Buffer=NULL;
     __u32 buftype = m_buftype;
@@ -2438,7 +2439,7 @@ void rgb2yuyv(uint8_t *prgb, uint8_t *pyuv, int width, int height)
 
 // Added by Sankari: Nov 8 2017 . prepare yuv buffer and give to shader.
 bool Videostreaming::prepareBuffer(__u32 pixformat, void *inputbuffer, __u32 bytesUsed){
-    cout << "Videostreaming::prepareBuffer()" << endl;
+    // cout << "Videostreaming::prepareBuffer()" << endl; // every frame
     if(pixformat == V4L2_PIX_FMT_MJPEG){
         frameMjpeg = true;
         m_renderer->renderBufferFormat = CommonEnums::RGB_BUFFER_RENDER;
@@ -2664,7 +2665,7 @@ void Videostreaming::doAfterChangeFPSAndShot(){
 
 void Videostreaming::freeBuffer(unsigned char *ptr)
 {
-    cout << "Videostreaming::freeBuffer()" << endl;
+    //if(logHere) cout << "Videostreaming::freeBuffer()" << endl; // every frame
     if(ptr) {
         free(ptr); ptr = NULL;
     }
@@ -2674,7 +2675,7 @@ void Videostreaming::freeBuffer(unsigned char *ptr)
 //Changed type of imgHeight and imgWidth from int to __u32
 bool Videostreaming::extractIRImage(unsigned short int *srcBuffer, unsigned char *irBuffer)
 {
-    cout << "Videostreaming::extractIRImage()" << endl;
+    if(logHere) cout << "Videostreaming::extractIRImage()" << endl;
     bool ret = 1;
     unsigned int irBufferLocation = 0;
 
@@ -2697,7 +2698,7 @@ bool Videostreaming::extractIRImage(unsigned short int *srcBuffer, unsigned char
 
 void Videostreaming::freeBuffers(unsigned char *destBuffer, unsigned char *copyBuffer)
 {
-    cout << "Videostreaming::freeBuffers()" << endl;
+    if(logHere) cout << "Videostreaming::freeBuffers()" << endl;
     if(copyBuffer || destBuffer)
     {
         free(copyBuffer);
@@ -2708,7 +2709,7 @@ void Videostreaming::freeBuffers(unsigned char *destBuffer, unsigned char *copyB
 
 void Videostreaming::allocBuffers()
 {
-    cout << "Videostreaming::allocBuffers()" << endl << flush;
+    if(logHere) cout << "Videostreaming::allocBuffers()" << endl << flush;
     m_renderer->videoResolutionwidth = m_width;
     m_renderer->videoResolutionHeight = m_height;
 
@@ -2736,7 +2737,7 @@ void Videostreaming::allocBuffers()
 }
 
 void Videostreaming::getFrameRates() {
-    cout << "Videostreaming::getFrameRates()" << endl;
+    // if(logHere) cout << "Videostreaming::getFrameRates()" << endl; // every frame
     struct timeval tv, res;
     if (m_frame == 0)
         gettimeofday(&m_tv, NULL);
@@ -2755,7 +2756,7 @@ void Videostreaming::getFrameRates() {
 
 bool Videostreaming::startCapture()
 {
-    cout << "Videostreaming::startCapture()" << endl;
+    if(logHere) cout << "Videostreaming::startCapture()" << endl;
     __u32 buftype = m_buftype;
     v4l2_requestbuffers req;
     unsigned int i;
@@ -2834,7 +2835,7 @@ bool Videostreaming::startCapture()
 
 int Videostreaming::findMax(QList<int> *list) {
 
-    cout << "Videostreaming::findMax()" << endl;
+    if(logHere) cout << "Videostreaming::findMax()" << endl;
     int array[list->count()];
     for(int j=0;j<list->count();j++)
         array[j] = list->at(j);
@@ -2861,7 +2862,7 @@ int Videostreaming::findMax(QList<int> *list) {
  * @param stillSkip
  */
 void Videostreaming::updateFrameToSkip(uint stillSkip){
-    cout << "Videostreaming::updateFrameToSkip(stillSkip: " << stillSkip << ")" << endl;
+    if(logHere) cout << "Videostreaming::updateFrameToSkip(stillSkip: " << stillSkip << ")" << endl;
     frameToSkip = stillSkip;
 }
 
@@ -2870,14 +2871,14 @@ void Videostreaming::updateFrameToSkip(uint stillSkip){
  * @param previewSkip
  */
 void Videostreaming::updatePreviewFrameSkip(uint previewSkip){
-    cout << "Videostreaming::updatePreviewFrameSkip(previewSkip: " << previewSkip << ")" << endl;
+    if(logHere) cout << "Videostreaming::updatePreviewFrameSkip(previewSkip: " << previewSkip << ")" << endl;
     skippingPreviewFrame = true;
     previewFrameToSkip = previewSkip;
 }
 
 
 void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
-    cout << "Videostreaming::makeShot() | filePath: " << filePath.toStdString() << "  imgFormatType: " << imgFormatType.toStdString() << endl << flush;
+    if(logHere) cout << "Videostreaming::makeShot() | filePath: " << filePath.toStdString() << "  imgFormatType: " << imgFormatType.toStdString() << endl << flush;
     captureTime.start();
     // Added by Sankari : to set still skip
     emit stillSkipCount(stillSize, lastPreviewSize, stillOutFormat);
@@ -2927,7 +2928,7 @@ void Videostreaming::makeShot(QString filePath,QString imgFormatType) {
  * @param fpsIndex - fps list index value need to set
  */
 void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatType, uint fpsIndex){
-    cout << "Videostreaming::changeFPSandTakeShot() | filePath: " << filePath.toStdString() << endl << flush;
+    if(logHere) cout << "Videostreaming::changeFPSandTakeShot() | filePath: " << filePath.toStdString() << endl << flush;
     captureTime.start();
     m_snapShot = true;
     retrieveShot = true;
@@ -2961,7 +2962,7 @@ void  Videostreaming::changeFPSandTakeShot(QString filePath,QString imgFormatTyp
 }
 
 void Videostreaming::triggerModeShot(QString filePath,QString imgFormatType) {
-    cout << "Videostreaming::triggerModeShot() | filePath: " << filePath.toStdString() << endl << flush;
+    if(logHere) cout << "Videostreaming::triggerModeShot() | filePath: " << filePath.toStdString() << endl << flush;
 
     captureTime.restart();
     m_snapShot = true;

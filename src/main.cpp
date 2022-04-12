@@ -82,6 +82,55 @@
 
 using namespace std;
 
+struct ConfigStruct {
+    bool exist;
+    int option;
+    int cameraMode;
+    int stillformatId;
+    int stillresolutionId;
+} conf;
+
+
+void loadConfig(string filename) {
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    FILE *fp = fopen(filename.c_str(), "r");
+
+    if (fp == NULL) {
+        cout << "Error! Could not open file: " << filename << endl;
+        exit(2);
+    }
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        if (line[0] == ';' || read <= 1) { // ignore comment
+            continue;
+        }
+        char *token = strtok(line, "=");
+        char *value = strtok(NULL, "=");
+
+        /*if (strcmp(token, "input") == 0) {
+            strncpy(input, value, strlen(value)-1);
+        }*/
+        if (strcmp(token, "option") == 0) {
+            conf.option = strtol(value, NULL, 10);
+        }
+        else if (strcmp(token, "cameraMode") == 0) {
+            conf.cameraMode = strtol(value, NULL, 10);
+        }
+        else if (strcmp(token, "stillformatId") == 0) {
+            conf.stillformatId = strtol(value, NULL, 10);
+        }
+        else if (strcmp(token, "stillresolutionId") == 0) {
+            conf.stillresolutionId = strtol(value, NULL, 10);
+        }
+    }
+    fclose(fp);
+    conf.exist = true;
+    cout << "Config file successfully loaded" << endl << flush;
+}
+
+
 int main(int argc, char *argv[])
 {
     /*Indentifying OS version*/
@@ -173,12 +222,30 @@ int main(int argc, char *argv[])
         if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){
             Cameraproperty camPropertyParam(true);
         }
+        else if(strcmp(argv[1],"-c") == 0 || strcmp(argv[1],"--config") == 0){
+            // load config
+            if(argc > 2) {
+                std::cout << "CONFIG FILE: " << argv[2] << std::endl << std::flush;
+                loadConfig(argv[2]);
+            } else {
+                std::cout << "Missing CONFIG filename!" << std::endl << std::flush;
+                return -1;
+            }
+        }
         else{
             qDebug()<<"Usage: qtcam [OPTION]";
             qDebug()<<"-l, --log    to create log in a directory\n";
+            qDebug()<<"-c, --config filename     load config file\n";
             return -1;
         }
     }
+    /*
+    cout << "AAAAA exists: " << conf.exist << endl;
+    cout << "AAAAA cameraMode: " << conf.cameraMode << endl;
+    cout << "AAAAA option: " << conf.option << endl;
+    cout << "AAAAA stillformatId: " << conf.stillformatId << endl;
+    cout << "AAAAA stillresolutionId: " << conf.stillresolutionId << endl;
+    */
 
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
@@ -187,9 +254,9 @@ int main(int argc, char *argv[])
 
 
     ///////////////////// MARTY /////////////////////
+    // if (conf.exist)
 
     int deviceIndex = 42;
-    camProperty.checkforDevice();
     camProperty.checkforDevice();
     QStringList availableCam = camProperty.modelCam.stringList();
     for (int i = 0; i < availableCam.size(); ++i) {
