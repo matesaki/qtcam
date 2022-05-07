@@ -17,18 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <algorithm>
+#include <iostream>
+#include <string>
 
 #include <QtWidgets/QApplication>
 #include <QDateTime>
 #include <QtWidgets/QWidget>
 #include <QIcon>
 #include <QStandardPaths>
-#include<QProcess>
-#include <iostream>
+#include <QProcess>
 #include "qtquick2applicationviewer.h"
 #include "cameraproperty.h"
 #include "videostreaming.h"
 #include "uvccamera.h"
+#include "mqttWorker.h"
 #include "seecam_10cug_bayer.h"
 #include "seecam_10cug_m.h"
 #include "seecam_11cug.h"
@@ -72,6 +75,8 @@
 #include "ecam83_usb.h"
 #include "see3cam_cu1330m.h"
 #include "see3cam_135m.h"
+
+#include "config.h"
 //*! \mainpage Qtcam - A econ's camera product
 // *
 // * \section See3CAM_10CUG
@@ -82,14 +87,13 @@
 
 using namespace std;
 
-struct ConfigStruct {
-    bool exist;
-    int option;
-    int cameraMode;
-    int stillformatId;
-    int stillresolutionId;
-} conf;
+ConfigStruct conf;
 
+string toStringWithoutNewLine(char *value) {
+    string str = value;
+    str.erase(remove(str.begin(), str.end(), '\n'), str.end());
+    return str;
+}
 
 void loadConfig(string filename) {
     char * line = NULL;
@@ -109,9 +113,6 @@ void loadConfig(string filename) {
         char *token = strtok(line, "=");
         char *value = strtok(NULL, "=");
 
-        /*if (strcmp(token, "input") == 0) {
-            strncpy(input, value, strlen(value)-1);
-        }*/
         if (strcmp(token, "option") == 0) {
             conf.option = strtol(value, NULL, 10);
         }
@@ -123,6 +124,21 @@ void loadConfig(string filename) {
         }
         else if (strcmp(token, "stillresolutionId") == 0) {
             conf.stillresolutionId = strtol(value, NULL, 10);
+        }
+        else if (strcmp(token, "mqttBroker") == 0) {
+            conf.mqttBroker = toStringWithoutNewLine(value);
+        }
+        else if (strcmp(token, "mqttPort") == 0) {
+            conf.mqttPort = strtol(value, NULL, 10);
+        }
+        else if (strcmp(token, "mqttTopicPub") == 0) {
+            conf.mqttTopicPub = toStringWithoutNewLine(value);
+        }
+        else if (strcmp(token, "mqttTopicSub") == 0) {
+            conf.mqttTopicSub = toStringWithoutNewLine(value);
+        }
+        else if (strcmp(token, "name") == 0) {
+            conf.name = toStringWithoutNewLine(value);
         }
     }
     fclose(fp);
@@ -235,17 +251,10 @@ int main(int argc, char *argv[])
         else{
             qDebug()<<"Usage: qtcam [OPTION]";
             qDebug()<<"-l, --log    to create log in a directory\n";
-            qDebug()<<"-c, --config filename     load config file\n";
+            qDebug()<<"-c, --config <filename>     load config file\n";
             return -1;
         }
     }
-    /*
-    cout << "AAAAA exists: " << conf.exist << endl;
-    cout << "AAAAA cameraMode: " << conf.cameraMode << endl;
-    cout << "AAAAA option: " << conf.option << endl;
-    cout << "AAAAA stillformatId: " << conf.stillformatId << endl;
-    cout << "AAAAA stillresolutionId: " << conf.stillresolutionId << endl;
-    */
 
     viewer.rootContext()->setContextProperty("camModels", &camProperty.modelCam);
 
@@ -256,6 +265,7 @@ int main(int argc, char *argv[])
     ///////////////////// MARTY /////////////////////
     // if (conf.exist)
 
+    /*
     int deviceIndex = 42;
     camProperty.checkforDevice();
     QStringList availableCam = camProperty.modelCam.stringList();
@@ -276,6 +286,10 @@ int main(int argc, char *argv[])
     See3CAM_CU20 cu20;
     bool res = cu20.getCameraMode();
     cout << "|| res: " << res << endl;
+    */
+
+    MqttWorker mqttworker(&conf);
+
 
     
     /////////////////////////////////////////////////

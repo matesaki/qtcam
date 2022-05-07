@@ -3,7 +3,7 @@ folder_01.source = qml/qtcam
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
-QT += widgets concurrent multimedia
+QT += widgets concurrent multimedia mqtt
 TARGET = qtcam
 
 CONFIG += release
@@ -29,6 +29,7 @@ SOURCES += main.cpp \
     see3cam_cu130.cpp \
     h264decoder.cpp \
     ascella.cpp \
+    mqttWorker.cpp \
     seecam_cu30.cpp \
     see3cam_130.cpp \
     see3cam_30.cpp \
@@ -89,6 +90,7 @@ HEADERS += \
     see3cam_cu130.h \
     h264decoder.h \
     ascella.h \
+    mqttWorker.h \
     seecam_cu30.h \
     common.h \
     see3cam_130.h \
