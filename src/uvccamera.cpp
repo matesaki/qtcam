@@ -517,7 +517,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
 
     if(hid_fd >= 0)
     {
-        cout << "uvccamera::initExtensionUnit | hid_fd >= 0  --> close" << endl;
+        cout << "uvccamera::initExtensionUnit | hid_fd = " << hid_fd << "  --> close" << endl;
         close(hid_fd);
     }
 
