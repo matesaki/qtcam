@@ -762,7 +762,7 @@ skip:
  * @brief FrameRenderer::drawUYVYBUffer - draw uyvy buffer
  */
 void FrameRenderer::drawUYVYBUffer(){
-    if(logHere) cout << "FrameRenderer::drawUYVYBUffer()" << endl << flush;
+    // if(logHere) cout << "FrameRenderer::drawUYVYBUffer()" << endl << flush;  // vypisuje do nekonecna
 
     int skipFrames = 4;
     m_shaderProgram->bind();
@@ -813,7 +813,7 @@ void FrameRenderer::drawUYVYBUffer(){
  * @brief FrameRenderer::drawY8BUffer - Shader for Y8 buffer and render
  */
 void FrameRenderer::drawY8BUffer(){
-    if(logHere) cout << "FrameRenderer::drawY8BUffer()" << endl << flush;
+    //if(logHere) cout << "FrameRenderer::drawY8BUffer()" << endl << flush;
 
     m_shaderProgram->bind();
     glVertexAttribPointer(mPositionLoc, 3, GL_FLOAT, false, 12, mVerticesDataPosition);

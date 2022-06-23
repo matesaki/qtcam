@@ -178,7 +178,7 @@ public:
     static libusb_device_handle* handle;  /* handle for USB device */
     int kernelDriverDetached;
 
-    static QMap<QString, QString> cameraMap;
+    static QMap<QString, QString> cameraMap;  // key: visible name like FSCAM_CU135, value eg: /dev/hidraw6
     static QMap<QString, QString> serialNumberMap;
     static int hid_fd;
     static QString hidNode;

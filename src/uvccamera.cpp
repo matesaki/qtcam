@@ -495,6 +495,8 @@ bool uvccamera::readFirmwareVersion(quint8 *pMajorVersion, quint8 *pMinorVersion
 }
 
 bool uvccamera::initExtensionUnit(QString cameraName) {
+    cout << "uvccamera::initExtensionUnit(cameraName = " << cameraName.toStdString() << ")" << endl;
+
     if(cameraName.isEmpty())
     {
         emit logHandle(QtCriticalMsg,"cameraName not passed as parameter\n");
@@ -511,16 +513,20 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
 
         }
     }
+    cout << "uvccamera::initExtensionUnit | originalDeviceName = " << originalDeviceName.toStdString() << endl;
 
     if(hid_fd >= 0)
     {
+        cout << "uvccamera::initExtensionUnit | hid_fd >= 0  --> close" << endl;
         close(hid_fd);
     }
 
     if(hidNode == "")
     {
+        cout << "uvccamera::initExtensionUnit | hidNode is empty" << endl;
         return false;
     }
+    cout << "uvccamera::initExtensionUnit | hidNode = " << hidNode.toStdString() << endl;
 
     //Commented by Nithyesh
     //uint i;
@@ -534,6 +540,8 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     QMap<QString, QString>::const_iterator ii = cameraMap.find(originalDeviceName);
     openNode = "";
     while (ii != cameraMap.end() && ii.key() == originalDeviceName) {
+        cout << "uvccamera::initExtensionUnit | ii.key() = " << ii.key().toStdString() << endl;
+        cout << "uvccamera::initExtensionUnit | hid_fd = open(ii.value = " << ii.value().toLatin1().data() << ")" << endl;
         hid_fd = open(ii.value().toLatin1().data(), O_RDWR|O_NONBLOCK);
         memset(buf, 0x0, sizeof(buf));
         /* Get Physical Location */
@@ -549,12 +557,14 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
         QString tempBuf = buf;
         if(tempBuf.contains(hidNode)) {
             openNode = ii.value();
+            cout << "uvccamera::initExtensionUnit | tempBuf.contains(hidNode) openNode = " << openNode.toStdString() << endl;
             close(hid_fd);
  //          break;
         }
         close(hid_fd);
         ++ii;
- }
+    }
+    cout << "uvccamera::initExtensionUnit | hid_fd = open(openNode = " << openNode.toLatin1().data() << ")" << endl;
     hid_fd = open(openNode.toLatin1().data(), O_RDWR|O_NONBLOCK);
     //Directly open from map value
     //fd = open(cameraMap.value(getCameraName()).toLatin1().data(), O_RDWR|O_NONBLOCK);

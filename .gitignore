@@ -11,3 +11,6 @@ src/qtcam.pro.user
 OUTPUTS.txt
 out.txt
 out.x
+*.jpg
+*.jpeg
+*.mp4

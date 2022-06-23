@@ -140,6 +140,9 @@ void loadConfig(string filename) {
         else if (strcmp(token, "name") == 0) {
             conf.name = toStringWithoutNewLine(value);
         }
+        else if (strcmp(token, "cameraName") == 0) {
+            conf.cameraName = toStringWithoutNewLine(value);
+        }
     }
     fclose(fp);
     conf.exist = true;
@@ -241,17 +244,18 @@ int main(int argc, char *argv[])
         else if(strcmp(argv[1],"-c") == 0 || strcmp(argv[1],"--config") == 0){
             // load config
             if(argc > 2) {
-                std::cout << "CONFIG FILE: " << argv[2] << std::endl << std::flush;
+                cout << "CONFIG FILE: " << argv[2] << endl << flush;
                 loadConfig(argv[2]);
+                cout << "SELF NAME: " << conf.name << endl;
             } else {
-                std::cout << "Missing CONFIG filename!" << std::endl << std::flush;
+                cout << "Missing CONFIG filename!" << endl << flush;
                 return -1;
             }
         }
         else{
             qDebug()<<"Usage: qtcam [OPTION]";
             qDebug()<<"-l, --log    to create log in a directory\n";
-            qDebug()<<"-c, --config <filename>     load config file\n";
+            qDebug()<<"-c, --config <filename.ini>     load config file\n";
             return -1;
         }
     }
@@ -288,7 +292,7 @@ int main(int argc, char *argv[])
     cout << "|| res: " << res << endl;
     */
 
-    MqttWorker mqttworker(&conf);
+    MqttWorker mqttworker(&conf, &camProperty);
 
 
     

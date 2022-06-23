@@ -1,15 +1,17 @@
 #ifndef MQTTWORKER_H
 #define MQTTWORKER_H
 
+#include <vector>
 #include <QMqttClient>
 #include "config.h"
+#include "cameraproperty.h"
 
 class MqttWorker : public QObject
 {
 	Q_OBJECT
 
 public:
-    explicit MqttWorker(ConfigStruct *conf);
+    explicit MqttWorker(ConfigStruct *conf, Cameraproperty *camProperty);
     ~MqttWorker(){};
 
 public slots:
@@ -28,6 +30,8 @@ private slots:
 private:
     QMqttClient *m_client;
     ConfigStruct *m_conf;
+    Cameraproperty *m_camProperty;
+    std::vector<int> m_camIdx;
 };
 
 #endif // MQTTWORKER_H

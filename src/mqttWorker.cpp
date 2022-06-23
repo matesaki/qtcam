@@ -3,12 +3,14 @@
 #include <iostream>
 #include <QtCore>
 #include "mqttWorker.h"
+#include "fscam_cu135.h"
 
 using namespace std;
 
-MqttWorker::MqttWorker(ConfigStruct *conf) {
+MqttWorker::MqttWorker(ConfigStruct *conf, Cameraproperty *camProperty) {
 	m_client = new QMqttClient();
     m_conf = conf;
+    m_camProperty = camProperty;
     fillMissingValuesInConfig();
 
     //connect(m_client, &QMqttClient::connected, this, &MqttWorker::brokerConnected);
@@ -89,6 +91,95 @@ void MqttWorker::brokerHostnameChanged(QString hostname) {
     cout << "MqttWorker | Broker hostname changed to '" << hostname.toStdString() << "'" << endl;
 }
 
-void MqttWorker::processCommand(string topic, string message) {
-    cout << "MqttWorker | Process command [" << topic << "] " << message << endl;
+void MqttWorker::processCommand(string topic, string command) {
+    cout << "MqttWorker | [" << topic << "] Process command: " << command << endl;
+
+    int deviceIndex = 9999;
+    m_camProperty->checkforDevice();
+    QStringList availableCam = m_camProperty->modelCam.stringList();
+    for (int i = 0; i < availableCam.size(); ++i) {
+        if (availableCam.at(i).toStdString() == m_conf->cameraName) {
+            deviceIndex = i;
+            m_camIdx.push_back(i);
+            cout << "|| index: " << i << endl;
+        }
+    }
+
+    if (command == "init") {
+        for(auto idx: m_camIdx) {
+            cout << "|| ============ swtrigger ================== || " << endl;
+            cout << "|| idx: " << idx << endl;
+            emit m_camProperty->setCurrentDevice(QString::number(idx), QString::fromStdString(m_conf->cameraName));
+
+            QString deviceNode = "";
+            m_camProperty->gainDeviceNodeMap(idx, deviceNode);
+            cout << "|| deviceNode: " << deviceNode.toStdString() << endl;
+            m_camProperty->openEventNode(deviceNode);
+
+            cout << "|| emit setFirstCamDevice(" << idx << "); " << endl;
+            emit m_camProperty->setFirstCamDevice(idx);
+
+            bool res = m_camProperty->uvccam.initExtensionUnit(QString::fromStdString(m_conf->cameraName));
+            cout << "|| uvccam.initExtensionUnit() result = " << res << endl;
+
+            FSCAM_CU135 cu135;
+            //bool res = cu135.initFSCAM_CU135((char*) deviceNode.toStdString().c_str());
+            //cout << "|| initFSCAM_CU135() result = " << res << endl;
+
+            FSCAM_CU135::camStreamMode swtrigg = FSCAM_CU135::camStreamMode::STREAM_SOFTWARE_TRIGGER;
+            //cout << "|| sw_trigg = " << swtrigg << endl;
+            res = cu135.setStreamMode(swtrigg);
+            cout << "|| cu135.setStreamMode() result = " << res << endl;
+            //cout << "|| cu135.getStillResolution()" << endl;
+            //cu135.getStillResolution();
+        }
+    } else if (command == "grab") {
+        for(auto idx: m_camIdx) {
+            cout << "|| ============= grab ================= || " << endl;
+            cout << "|| idx: " << idx << endl;
+            emit m_camProperty->setCurrentDevice(QString::number(idx), QString::fromStdString(m_conf->cameraName));
+
+            QString deviceNode = "";
+            m_camProperty->gainDeviceNodeMap(idx, deviceNode);
+            cout << "|| deviceNode: " << deviceNode.toStdString() << endl;
+            m_camProperty->openEventNode(deviceNode);
+
+            cout << "|| emit setFirstCamDevice(" << idx << "); " << endl;
+            emit m_camProperty->setFirstCamDevice(idx);
+
+            FSCAM_CU135 cu135;
+            bool res = cu135.initFSCAM_CU135((char*) deviceNode.toStdString().c_str());
+            cout << "|| initFSCAM_CU135 result = " << res << endl;
+
+            FSCAM_CU135::camStreamMode swtrigg = FSCAM_CU135::camStreamMode::STREAM_SOFTWARE_TRIGGER;
+            cout << "|| sw_trigg = " << swtrigg << endl;
+            cout << "|| cu135.setStreamMode()" << endl;
+            cu135.setStreamMode(swtrigg);
+            cout << "|| cu135.getStillResolution()" << endl;
+            cu135.getStillResolution();
+        }
+    } else {
+        cout << "|| Unknown command" << endl;
+
+    }
+
+    /*
+    cout << "|| deviceIndex: " << deviceIndex << endl;
+    emit m_camProperty->setCurrentDevice(QString::number(deviceIndex), QString::fromStdString(m_conf->cameraName));
+
+    QString deviceNode = "";
+    m_camProperty->gainDeviceNodeMap(deviceIndex, deviceNode);
+    cout << "|| deviceNode: " << deviceNode.toStdString() << endl;
+    m_camProperty->openEventNode(deviceNode);
+
+    cout << "|| emit setFirstCamDevice(4); " << endl;
+    emit m_camProperty->setFirstCamDevice(4);
+    */
+
+    // Find all cameras (get count)
+    // Select right cameras (get indexes?)
+    // Set format and output path/name
+    // Switch to SW trigger (and back)
+    // Store frame
+    // Save image to location
 }

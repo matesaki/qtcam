@@ -12,6 +12,7 @@ struct ConfigStruct {
     std::string mqttTopicSub;
     int mqttPort;
     std::string name;
+    std::string cameraName;
 };
 
 #endif // MQTTWORKER_H

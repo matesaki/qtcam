@@ -23,6 +23,8 @@
 #include "uvccamera.h"
 #include "videostreaming.h"
 
+using namespace std;
+
 
 FSCAM_CU135::FSCAM_CU135(QObject *parent) :
     QObject(parent)
@@ -1091,11 +1093,14 @@ void FSCAM_CU135::initializeBuffers(){
     memset(g_out_packet_buf, 0x00, sizeof(g_out_packet_buf));
     memset(g_in_packet_buf, 0x00, sizeof(g_in_packet_buf));
 }
+
 bool FSCAM_CU135::initFSCAM_CU135(char *hidDeviceName)
 {
+    cout << "FSCAM_CU135::initFSCAM_CU135(hidDeviceName = " << hidDeviceName << ")" << endl << flush;
     initializeBuffers();
     if(hidDeviceName == NULL)
     {
+        cout << "FSCAM_CU135::initFSCAM_CU135 | hidDeviceName == NULL" << endl;
         return false;
     }
 
@@ -1108,6 +1113,7 @@ bool FSCAM_CU135::initFSCAM_CU135(char *hidDeviceName)
 
     if(uvccamera::hid_fd < 0)
     {
+        cout << "FSCAM_CU135::initFSCAM_CU135 | (uvccamera::hid_fd < 0)" << endl;
         return false;
     }
 

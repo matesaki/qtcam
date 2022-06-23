@@ -236,14 +236,14 @@ void Cameraproperty::checkforDevice() {
         if(logHere) cout << "Cameraproperty::checkforDevice() | - " << c.toStdString() << endl << flush;
     }
 
-    if(logHere) cout << "Cameraproperty::checkforDevice() | cameraMap:" << endl << flush;
+    if(logHere) cout << "Cameraproperty::checkforDevice() | cameraMap (key:value):" << endl << flush;
     QMapIterator<int, QString> i(cameraMap);
     while (i.hasNext()) {
         i.next();
         if(logHere) cout << "Cameraproperty::checkforDevice() | - " << i.key() << ": " << i.value().toStdString() << endl;
     }
 
-    if(logHere) cout << "Cameraproperty::checkforDevice() | deviceNodeMap:" << endl << flush;
+    if(logHere) cout << "Cameraproperty::checkforDevice() | deviceNodeMap (key:value):" << endl << flush;
     QMapIterator<int, QString> ii(deviceNodeMap);
     while (ii.hasNext()) {
         ii.next();
