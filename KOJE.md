@@ -14,6 +14,7 @@ Sending commands (in first terminal):
 mosquitto_pub -t cmd -m "init"        # Try to connect to all cameras
 mosquitto_pub -t cmd -m "swtrigger"   # Switch to SW trigger all cameras
 mosquitto_pub -t cmd -m "notrigger"   # Switch to regular (video) mode all cameras
+mosquitto_pub -t cmd -m "exit"        # Deinicalize cameras and exit the app
 ```
 
 

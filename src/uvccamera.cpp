@@ -213,7 +213,7 @@ int uvccamera::enumerateDevices(QStringList* deviceNames,QStringList* devicePath
 
 int uvccamera::findEconDevice(QString parameter)
 {
-    std::cout << "uvccamera::findEconDevice() parameter: " << parameter.toStdString() << std::endl << std::flush;
+    cout << "uvccamera::findEconDevice() parameter: " << parameter.toStdString() << endl;
     emit logHandle(QtDebugMsg,"Check Devices of"+ parameter);
     cameraMap.clear();
     struct udev *udev;
@@ -495,7 +495,7 @@ bool uvccamera::readFirmwareVersion(quint8 *pMajorVersion, quint8 *pMinorVersion
 }
 
 bool uvccamera::initExtensionUnit(QString cameraName) {
-    cout << "uvccamera::initExtensionUnit(cameraName = " << cameraName.toStdString() << ")" << endl;
+    cout << "=== uvccamera::initExtensionUnit(cameraName = " << cameraName.toStdString() << ")" << endl;
 
     if(cameraName.isEmpty())
     {
@@ -517,11 +517,12 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
 
     if(hid_fd >= 0)
     {
-        cout << "uvccamera::initExtensionUnit | hid_fd = " << hid_fd << "  --> close" << endl;
-        close(hid_fd);
+        //cout << "uvccamera::initExtensionUnit | hid_fd = " << hid_fd << "  --> close" << endl;
+        //close(hid_fd);  // closing manually
+        ///hid_fd = -1;
     }
 
-    if(hidNode == "")
+    if(hidNode == "") // eg: usb-0000:00:14.0-5.2.3
     {
         cout << "uvccamera::initExtensionUnit | hidNode is empty" << endl;
         return false;
@@ -540,8 +541,8 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     QMap<QString, QString>::const_iterator ii = cameraMap.find(originalDeviceName);
     openNode = "";
     while (ii != cameraMap.end() && ii.key() == originalDeviceName) {
-        cout << "uvccamera::initExtensionUnit | ii.key() = " << ii.key().toStdString() << endl;
-        cout << "uvccamera::initExtensionUnit | hid_fd = open(ii.value = " << ii.value().toLatin1().data() << ")" << endl;
+        //cout << "uvccamera::initExtensionUnit | ii.key() = " << ii.key().toStdString() << endl; // == FSCAM_CU135
+        //cout << "uvccamera::initExtensionUnit | hid_fd = open(ii.value = " << ii.value().toLatin1().data() << ")" << endl; // e.g.: /dev/hidraw5
         hid_fd = open(ii.value().toLatin1().data(), O_RDWR|O_NONBLOCK);
         memset(buf, 0x0, sizeof(buf));
         /* Get Physical Location */
@@ -566,6 +567,7 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
     }
     cout << "uvccamera::initExtensionUnit | hid_fd = open(openNode = " << openNode.toLatin1().data() << ")" << endl;
     hid_fd = open(openNode.toLatin1().data(), O_RDWR|O_NONBLOCK);
+    cout << "uvccamera::initExtensionUnit | hid_fd = " << hid_fd << endl;
     //Directly open from map value
     //fd = open(cameraMap.value(getCameraName()).toLatin1().data(), O_RDWR|O_NONBLOCK);
 
@@ -632,19 +634,23 @@ bool uvccamera::initExtensionUnit(QString cameraName) {
             emit logHandle(QtCriticalMsg,"OS Identification failed\n");
         }
     }    
+    /*
     if(desc_size == DESCRIPTOR_SIZE_ENDPOINT)
         {
             hid_fd = fd;
+            cout << "uvccamera::initExtensionUnit | DESCRIPTOR_SIZE_ENDPOINT hid_fd = " << hid_fd << endl;
         }
         else if(desc_size == DESCRIPTOR_SIZE_IMU_ENDPOINT)
         {
             hid_imu = fd;
-        }
+            cout << "uvccamera::initExtensionUnit | DESCRIPTOR_SIZE_IMU_ENDPOINT hid_imu = " << hid_imu << endl;
+        }*/
       return true;
     }
 
+
 void uvccamera::getDeviceNodeName(QString hidDeviceNode) {
-    cout << "uvccamera::closeAscellaDevice() | hidDeviceNode: " << hidDeviceNode.toStdString() << endl << flush;
+    cout << "uvccamera::getDeviceNodeName() | hidDeviceNode: " << hidDeviceNode.toStdString() << endl << flush;
     if(hidDeviceNode.isEmpty())
     {
         emit logHandle(QtCriticalMsg,"hid Device usbAddress Not found as parameter\n");
@@ -655,6 +661,10 @@ void uvccamera::getDeviceNodeName(QString hidDeviceNode) {
 
 void uvccamera::exitExtensionUnit() {
         close(hid_fd);
+}
+
+void uvccamera::exitDevice(int hid) {
+    close(hid);
 }
 
 bool uvccamera::exitExtensionUnitAscella(){
@@ -785,6 +795,11 @@ bool uvccamera::getUniqueId() {
 
 void uvccamera::getSerialNumber(){
      emit serialNumber("Serial Number: "+serialNumberMap.value(openNode));
+    cout << "uvccamera::getSerialNumber(): " << serialNumberMap.value(openNode).toStdString() << endl;
+}
+
+std::string uvccamera::getSerialNo(){
+    return serialNumberMap.value(openNode).toStdString();
 }
 
 QString uvccamera::retrieveSerialNumber()
@@ -1270,7 +1285,7 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
     FD_SET(hid_fd, &rfds);
 
     /* Wait up to 5 seconds. */
-    tv.tv_sec = 5;
+    tv.tv_sec = 2; // a little faster
     tv.tv_usec = 0;
 
     // Monitor read file descriptor for 5 secs

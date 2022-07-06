@@ -348,7 +348,7 @@ bool FSCAM_CU135::getiHDRMode()
 
 bool FSCAM_CU135::setStreamMode(camStreamMode streamMode)
 {
-    std::cout << "fscam_cu135.cpp | setStreamMode() streamMode:" << streamMode << std::endl << std::flush;
+    cout << "fscam_cu135.cpp | setStreamMode() streamMode: " << streamMode << " hid_fd: " << uvccamera::hid_fd << endl << flush;
     // hid validation
     if(uvccamera::hid_fd < 0)
     {
@@ -375,12 +375,13 @@ bool FSCAM_CU135::setStreamMode(camStreamMode streamMode)
             return true;
         }
     }
+    cout << " 44444" << endl;
     return false;
 }
 
 bool FSCAM_CU135::getStreamMode()
 {
-    std::cout << "fscam_cu135.cpp | getStreamMode()" << std::endl << std::flush;
+    cout << "fscam_cu135.cpp | getStreamMode()" << endl << flush;
    uint streamMode;
 
    // hid validation

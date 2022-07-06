@@ -235,6 +235,9 @@ public:
 
     unsigned int getTickCount();
 
+    std::string getSerialNo();
+    void exitDevice(int hid);
+
 signals:
     void logHandle(QtMsgType,QString);
     void stopPreview(QString);
