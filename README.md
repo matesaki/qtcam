@@ -1,11 +1,41 @@
-Qtcam - Qt Quick Based Camera Application
+# Extension for the KOJE project
+
+## MQTT communication
+
+Connection informations are taken from configuration file [-c <config.ini>]
+
+All communication is made through Mosquitto (MQTT). On linux install: `sudo apt install -y mosquitto-clients`.
+Master PC send commands on topic "cmd".
+Slave PCs respond on topic "info/<name>".
+
+
+Sending commands (in first terminal):
+```
+mosquitto_pub -t cmd -m "init"        # Try to connect to all cameras
+mosquitto_pub -t cmd -m "swtrigger"   # Switch to SW trigger all cameras
+mosquitto_pub -t cmd -m "notrigger"   # Switch to regular (video) mode all cameras
+mosquitto_pub -t cmd -m "exit"        # Deinicalize cameras and exit the app
+```
+
+
+Read statuses (in second terminal):
+```
+mosquitto_sub -t "info/#" -v
+```
+
+
+---
+
+
+
+## Qtcam - Qt Quick Based Camera Application
 
 Copyright © 2015 e-con Systems India Pvt. Limited
 All rights reserved.
 
 
-Application Features:
-*********************
+### Application Features:
+
 1. Emulated support for still pin capture in linux.
 2. Image Quality Settings(like brightness or other available options) to enable adjustments in preview.
 3. Still Capture Settings tab to change the capture image save location and to find the support color space and resolution for still.
@@ -17,12 +47,12 @@ Application Features:
 10. Keyboard Navigations.
 11. Tool tips throughout the application.
 
-INSTALL:
-********
+### INSTALL:
+
 Please look into the INSTALL file for more details
 
-License:
-*********
+### License:
+
 Qtcam is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3, or (at your option)
@@ -36,19 +66,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Qtcam. If not, see <http://www.gnu.org/licenses/>.
 
-TODOS:
-******
+### TODOS:
+
 1. Display all the available codecs from the system.
 2. Option to enable the preview to be scaled as per the screen.  
 3. Optimize the CPU usage - v4lconvert library is consuming the high cpu usage.
 4. Enhance the application by sending the captured data over the network.
 5. Add support for audio recording.
-Limitations
-***********
+
+### Limitations
+
    During resolution switch, it is recommended to switch to next resolution only after preview appears for previous resolution switch.
 
-Known Issues/Bugs:
-******************
+### Known Issues/Bugs:
+
 1. If there is a drop in frame rates during video recording, then the actual video playback time and recording time is different.
 2. In see3cam50 still capture is sometime gets distorted due to the extra exposure from camera.
 3. For MJPG color space, images captured is not clear only in the case still and preview resolution are different.
@@ -59,4 +90,3 @@ Known Issues/Bugs:
 8. In Ascella camera, When Black and white mode is set in UI[Extension settings], it reflects black and white mode in camera. Inconsistently, after launching and closing application continuously for several times, it is changed to normal effect mode.
 9. Inconsistently external trigger keys are not coming to application. In that time, not able to capture images when external key pressed and during smile trigger capture.
 10.During resolution switch, it is recommended to switch to next resolution only after preview appears for previous resolution switch in NileCAM30_USB camera.
-
