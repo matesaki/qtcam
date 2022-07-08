@@ -1308,3 +1308,14 @@ bool uvccamera::sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len)
     }
 
 }
+
+bool uvccamera::sendHidCmdFast(unsigned char *outBuf, int len)
+{
+    cout << "uvccamera::sendHidCmdFast()" << endl << flush;
+    // Write data into camera
+    int ret = write(hid_fd, outBuf, len);
+    if (ret < 0) {
+        return false;
+    }
+    return true;
+}

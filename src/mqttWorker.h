@@ -14,7 +14,6 @@ public:
         hidFd = -1;
         serialNo = "";
         deviceNode = "";
-
     };
     ~CameraInfo(){};
     void printAll();

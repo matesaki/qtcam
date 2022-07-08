@@ -55,7 +55,7 @@ class FrameRenderer : public QObject, protected QOpenGLFunctions
 public:
     FrameRenderer();
     ~FrameRenderer();
-    bool logHere = true;
+    bool logHere = false;
 
     int skipH264Frames;
 

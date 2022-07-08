@@ -113,10 +113,7 @@ void loadConfig(string filename) {
         char *token = strtok(line, "=");
         char *value = strtok(NULL, "=");
 
-        if (strcmp(token, "option") == 0) {
-            conf.option = strtol(value, NULL, 10);
-        }
-        else if (strcmp(token, "cameraMode") == 0) {
+        if (strcmp(token, "cameraMode") == 0) {
             conf.cameraMode = strtol(value, NULL, 10);
         }
         else if (strcmp(token, "stillformatId") == 0) {
@@ -142,6 +139,10 @@ void loadConfig(string filename) {
         }
         else if (strcmp(token, "cameraName") == 0) {
             conf.cameraName = toStringWithoutNewLine(value);
+        }
+        else if (strcmp(token, "storePlace") == 0) {
+            conf.storePlace = toStringWithoutNewLine(value);
+            cout << "conf.storePlace: " << conf.storePlace << endl;
         }
     }
     fclose(fp);

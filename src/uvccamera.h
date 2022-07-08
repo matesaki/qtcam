@@ -264,6 +264,7 @@ public slots:
      * @param len    - Buffer length
      */
     bool sendHidCmd(unsigned char *outBuf, unsigned char *inBuf, int len);
+    bool sendHidCmdFast(unsigned char *outBuf, int len);
 
     /**
      * @brief Get the firmware version of the camera

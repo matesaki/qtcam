@@ -3,7 +3,6 @@
 
 struct ConfigStruct {
     bool exist;
-    int option;
     int cameraMode;
     int stillformatId;
     int stillresolutionId;
@@ -13,6 +12,7 @@ struct ConfigStruct {
     int mqttPort;
     std::string name;
     std::string cameraName;
+    std::string storePlace;
 };
 
 #endif // MQTTWORKER_H

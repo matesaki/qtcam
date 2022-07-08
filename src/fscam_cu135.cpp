@@ -916,6 +916,32 @@ bool FSCAM_CU135::storePreviewFrame()
     return false;
 }
 
+bool FSCAM_CU135::storePreviewFrameFast()
+{
+    std::cout << "fscam_cu135.cpp | storePreviewFrameFast()" << std::endl << std::flush;
+
+    if(uvccamera::hid_fd < 0)
+    {
+        return false;
+    }
+
+    //Initialize buffers
+    initializeBuffers();
+
+    //Set the Report Number
+    g_out_packet_buf[1] = CAMERA_CONTROL_FSCAM_CU135;// camera control id
+    g_out_packet_buf[2] = STORE_FRAME; // store frame
+    g_out_packet_buf[3] = STORE_PREV_FRAME; // store previous frame
+
+    // send request and get reply from camera
+    if(uvc.sendHidCmdFast(g_out_packet_buf, BUFFER_LENGTH)){
+        //if (g_in_packet_buf[6]== GET_SUCCESS) {
+           return true;
+        //}
+    }
+    return false;
+}
+
 bool FSCAM_CU135::storeStillFrame(uint stillformatId, uint stillresolutionId)
 {
     std::cout << "fscam_cu135.cpp | storeStillFrame() stillformatId:" << stillformatId << "  stillresolutionId:" << stillresolutionId << std::endl << std::flush;

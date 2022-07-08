@@ -3725,7 +3725,7 @@ void Videostreaming::cameraFilterControls(bool actualValue) {
 }
 
 QString Videostreaming::getSettings(unsigned int id) {
-    if(logHere) cout << "Videostreaming::getSettings()" << endl;
+    if(logHere) cout << "Videostreaming::getSettings(id: " << id << ")" << endl;
     int tries = IOCTL_RETRY;
     struct v4l2_control c;
     c.id = id;
@@ -3737,7 +3737,7 @@ QString Videostreaming::getSettings(unsigned int id) {
 }
 
 void Videostreaming::changeSettings(unsigned int id, QString value) {
-    if(logHere) cout << "Videostreaming::changeSettings()" << endl;
+    if(logHere) cout << "Videostreaming::changeSettings(id: " << id << ", value: " << value.toStdString() << ")" << endl;
     struct v4l2_control c;
     c.id = id;
     c.value = value.toInt();
@@ -3747,7 +3747,7 @@ void Videostreaming::changeSettings(unsigned int id, QString value) {
 }
 
 void Videostreaming::selectMenuIndex(unsigned int id, int value) {
-    if(logHere) cout << "Videostreaming::selectMenuIndex()" << endl;
+    if(logHere) cout << "Videostreaming::selectMenuIndex(id: " << id << ", value: " << value << ")" << endl;
     v4l2_queryctrl qctrl;
     v4l2_querymenu qmenu;
     qctrl.id = id;
@@ -3765,7 +3765,7 @@ void Videostreaming::selectMenuIndex(unsigned int id, int value) {
 }
 
 int Videostreaming::getMenuIndex(unsigned int id,int value) {
-    if(logHere) cout << "Videostreaming::getMenuIndex()" << endl;
+    if(logHere) cout << "Videostreaming::getMenuIndex(id: " << id << ", value: " << value << ")" << endl;
     v4l2_queryctrl qctrl;
     v4l2_querymenu qmenu;
     qctrl.id = id;
@@ -3786,7 +3786,7 @@ int Videostreaming::getMenuIndex(unsigned int id,int value) {
 }
 
 void Videostreaming::setStillVideoSize(QString stillValue, QString stillFormat) {
-    if(logHere) cout << "Videostreaming::setStillVideoSize()" << endl;
+    if(logHere) cout << "Videostreaming::setStillVideoSize(stillValue: " << stillValue.toStdString() << ", stillFormat: " << stillFormat.toStdString() << ")" << endl;
     stillSize = stillValue;
     stillOutFormat = stillFormat;
     if(currentlySelectedCameraEnum == CommonEnums::ECAM83_USB && m_capSrcFormat.fmt.pix.pixelformat==V4L2_PIX_FMT_H264)

@@ -324,6 +324,7 @@ public slots:
 
     bool grabPreviewFrame();
     bool storePreviewFrame();
+    bool storePreviewFrameFast();
     bool storeStillFrame(uint stillformatId,uint stillresolutionId);
 
     bool getNumberOfFramesCanStore(uint stillformatId,uint stillresolutionId);

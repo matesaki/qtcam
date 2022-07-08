@@ -109,9 +109,10 @@ void MqttWorker::processCommand(string topic, string command) {
     QString deviceNode = "";
     string msg = "";  // msg to publish on mqtt
     bool res = false;
+    FSCAM_CU135 cu135;
 
     if (command == "init") {
-        vector<int> camIdx;  /// TODO HERE
+        vector<int> camIdx;
         closeAndClearAll();
 
         // get camera indexes by name, needed only during init
@@ -125,25 +126,33 @@ void MqttWorker::processCommand(string topic, string command) {
 
         cout << "|| INIT camIdx.size() == " << camIdx.size() << endl;
         publishMsg("INIT | Number of cameras: " + to_string(camIdx.size()));
+        bool res2;
         for(auto idx: camIdx) {
+            res2 = false;
             emit m_camProperty->setCurrentDevice(QString::number(idx), QString::fromStdString(m_conf->cameraName));
             m_camProperty->gainDeviceNodeMap(idx, deviceNode);
             m_camProperty->openEventNode(deviceNode);
             emit m_camProperty->setFirstCamDevice(idx);
 
             res = m_camProperty->uvccam.initExtensionUnit(QString::fromStdString(m_conf->cameraName));
+
+            if (res) {
+                res2 = cu135.setStillResolution(m_conf->stillformatId, m_conf->stillresolutionId);
+            }
             //cout << "|| uvccam.initExtensionUnit() result = " << res << endl;
             msg = "INIT | " + deviceNode.toStdString() + " | " + m_camProperty->uvccam.getSerialNo() + " | ";
-            if (res) {
-                publishMsg(msg + "OK");
-                CameraInfo caminfo;
+            if (res && res2) {
+                publishMsg(msg + "OK | OK");
+                CameraInfo caminfo;  // create object with info about camera
                 caminfo.camIdx = idx;
                 caminfo.hidFd = m_camProperty->uvccam.hid_fd;
                 caminfo.serialNo = m_camProperty->uvccam.getSerialNo();
                 caminfo.deviceNode = deviceNode.toStdString();
                 m_cameraInfo.push_back(caminfo);
+            } else if (res && !res2) {
+                publishMsg(msg + "OK | FAIL");
             } else {
-                publishMsg(msg + "FAIL");
+                publishMsg(msg + "FAIL | FAIL");
             }
         }
         if (camIdx.size() == 0) {
@@ -155,7 +164,6 @@ void MqttWorker::processCommand(string topic, string command) {
     }
     else if (command == "swtrigger") {
         cout << "|| SW_TRIGGER m_cameraInfo.size() == " << m_cameraInfo.size() << endl;
-        FSCAM_CU135 cu135;
 
         for (auto caminfo: m_cameraInfo) {
             //caminfo.printAll();
@@ -209,7 +217,18 @@ void MqttWorker::processCommand(string topic, string command) {
         cout << "|| NO_TRIGGER - not implemented yet :(" << endl;
     }
     else if (command == "grab") {
-        cout << "|| GRAB - not implemented yet :(" << endl;
+        cout << "|| GRAB ||" << endl;
+        for (auto caminfo: m_cameraInfo) {
+            m_camProperty->uvccam.hid_fd = caminfo.hidFd;
+            res = cu135.storePreviewFrameFast();
+
+            msg = "GRAB | " + caminfo.deviceNode + " | " + caminfo.serialNo + " | ";
+            if (res) {
+                publishMsg(msg + "OK");
+            } else {
+                publishMsg(msg + "FAIL");
+            }
+        }
     }
     else if (command == "exit") {
         cout << "|| EXIT ||" << endl;
@@ -245,13 +264,13 @@ void MqttWorker::processCommand(string topic, string command) {
     // Save image to location
 }
 
-
+//=============================================================================
 
 void CameraInfo::printAll() {
-    cout << "CameraInfo || ";
-    cout << "camIdx: " << camIdx;
-    cout << " | hidFd: " << hidFd;
-    cout << " | serialNo: " << serialNo;
-    cout << " | deviceNode: " << deviceNode;
-    cout << " ||" << endl << flush;
+    cout << "CameraInfo || " << endl;
+    cout << " | camIdx: " << camIdx << endl;
+    cout << " | hidFd: " << hidFd << endl;
+    cout << " | serialNo: " << serialNo << endl;
+    cout << " | deviceNode: " << deviceNode << endl;
+    cout << flush;
 }
