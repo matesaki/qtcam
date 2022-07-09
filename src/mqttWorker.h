@@ -53,7 +53,6 @@ private:
     QMqttClient *m_client;
     ConfigStruct *m_conf;
     Cameraproperty *m_camProperty;
-    std::vector<int> m_camIdx; // delete this
     std::vector<CameraInfo> m_cameraInfo;
 };
 

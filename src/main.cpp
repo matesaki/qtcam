@@ -237,6 +237,7 @@ int main(int argc, char *argv[])
 
     //Create a object for Camera property
     Cameraproperty camProperty;    
+    bool startGUI = true;
 
     if(argc > 1){
         if(strcmp(argv[1],"-l") == 0 || strcmp(argv[1],"--log") == 0){
@@ -253,10 +254,14 @@ int main(int argc, char *argv[])
                 return -1;
             }
         }
+        else if(strcmp(argv[1],"-t") == 0 || strcmp(argv[1],"--nogui") == 0){
+            startGUI = false;
+        }
         else{
             qDebug()<<"Usage: qtcam [OPTION]";
-            qDebug()<<"-l, --log    to create log in a directory\n";
-            qDebug()<<"-c, --config <filename.ini>     load config file\n";
+            qDebug()<<" -l, --log                    to create log in a directory";
+            qDebug()<<" -c, --config <filename.ini>  load config file";
+            qDebug()<<" -t, --nogui                  run withou GUI window";
             return -1;
         }
     }
@@ -267,37 +272,7 @@ int main(int argc, char *argv[])
     AudioInput audio;
 
 
-    ///////////////////// MARTY /////////////////////
-    // if (conf.exist)
-
-    /*
-    int deviceIndex = 42;
-    camProperty.checkforDevice();
-    QStringList availableCam = camProperty.modelCam.stringList();
-    for (int i = 0; i < availableCam.size(); ++i) {
-        if (availableCam.at(i).toStdString() == "See3CAM_CU20") {
-            deviceIndex = i;
-            break;
-        }
-    }
-    cout << "|| deviceIndex: " << deviceIndex << endl;
-    camProperty.setCurrentDevice(QString::number(deviceIndex), "See3CAM_CU20");
-
-    QString deviceNode = "";
-    camProperty.gainDeviceNodeMap(deviceIndex, deviceNode);
-    cout << "|| deviceNode: " << deviceNode.toStdString() << endl;
-    camProperty.openEventNode(deviceNode);
-
-    See3CAM_CU20 cu20;
-    bool res = cu20.getCameraMode();
-    cout << "|| res: " << res << endl;
-    */
-
     MqttWorker mqttworker(&conf, &camProperty);
-
-
-    
-    /////////////////////////////////////////////////
 
 
     if(is20_04detected)
@@ -333,6 +308,8 @@ int main(int argc, char *argv[])
     viewer.setIcon(icon);
     viewer.setTitle("Qtcam");
     //Bug fix: There's no "close,Restore Down,minimize" button on the top of the QTCAM when restore the application
-    viewer.show();
+    if (startGUI) {
+        viewer.show();  // HIDE/SHOW GUI INTERFACE
+    }
     return app.exec();
 }

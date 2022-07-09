@@ -158,9 +158,6 @@ void MqttWorker::processCommand(string topic, string command) {
         if (camIdx.size() == 0) {
             publishMsg("INIT | No cameras!!");
         }
-        /*for (auto caminfo: m_cameraInfo) {
-            caminfo.printAll();
-        }*/
     }
     else if (command == "swtrigger") {
         cout << "|| SW_TRIGGER m_cameraInfo.size() == " << m_cameraInfo.size() << endl;
@@ -168,14 +165,6 @@ void MqttWorker::processCommand(string topic, string command) {
         for (auto caminfo: m_cameraInfo) {
             //caminfo.printAll();
             m_camProperty->uvccam.hid_fd = caminfo.hidFd;
-            /*cout << "  11111" << endl;
-            emit m_camProperty->setCurrentDevice(caminfo.QcamIdx(), QString::fromStdString(m_conf->cameraName));
-            cout << "  22222" << endl;
-            //m_camProperty->gainDeviceNodeMap(caminfo.camIdx, caminfo.deviceNode);
-            m_camProperty->openEventNode(caminfo.QdeviceNode());
-            cout << "  33333" << endl;
-            emit m_camProperty->setFirstCamDevice(caminfo.camIdx);
-            cout << "  44444" << endl;*/
 
             res = cu135.setStreamMode(FSCAM_CU135::camStreamMode::STREAM_SOFTWARE_TRIGGER);
             msg = "SW_TRIGGER | " + caminfo.deviceNode + " | " + caminfo.serialNo + " | ";
@@ -186,29 +175,6 @@ void MqttWorker::processCommand(string topic, string command) {
             }
         }
 
-        /*
-        for(auto idx: m_camIdx) {
-            emit m_camProperty->setCurrentDevice(QString::number(idx), QString::fromStdString(m_conf->cameraName));
-            m_camProperty->gainDeviceNodeMap(idx, deviceNode);
-            m_camProperty->openEventNode(deviceNode);
-            emit m_camProperty->setFirstCamDevice(idx);
-
-            bool res = m_camProperty->uvccam.initExtensionUnit(QString::fromStdString(m_conf->cameraName));
-            if (res) {
-                FSCAM_CU135 cu135;
-                res = cu135.setStreamMode(FSCAM_CU135::camStreamMode::STREAM_SOFTWARE_TRIGGER);
-                //cout << "|| cu135.setStreamMode() result = " << res << endl;
-                //cout << "|| cu135.getStillResolution()" << endl;
-                //cu135.getStillResolution();
-                msg = "SW_TRIGGER | " + deviceNode.toStdString() + " | " + m_camProperty->uvccam.getSerialNo() + " | ";
-                if (res) {
-                    publishMsg(msg + "OK");
-                } else {
-                    publishMsg(msg + "FAIL");
-                }
-            }
-
-        }*/
         if (m_cameraInfo.size() == 0) {
             publishMsg("SW_TRIGGER | No cameras (did you start with 'init'?)");
         }
@@ -242,19 +208,6 @@ void MqttWorker::processCommand(string topic, string command) {
     else {
         cout << "|| Unknown command: " << command << endl;
     }
-
-    /*
-    cout << "|| deviceIndex: " << deviceIndex << endl;
-    emit m_camProperty->setCurrentDevice(QString::number(deviceIndex), QString::fromStdString(m_conf->cameraName));
-
-    QString deviceNode = "";
-    m_camProperty->gainDeviceNodeMap(deviceIndex, deviceNode);
-    cout << "|| deviceNode: " << deviceNode.toStdString() << endl;
-    m_camProperty->openEventNode(deviceNode);
-
-    cout << "|| emit setFirstCamDevice(4); " << endl;
-    emit m_camProperty->setFirstCamDevice(4);
-    */
 
     // Find all cameras (get count)
     // Select right cameras (get indexes?)
